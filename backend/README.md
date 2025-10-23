@@ -1,98 +1,369 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+📚 Backend: Gestão de Cursos AKCIT (NestJS)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este documento detalha o escopo de desenvolvimento do backend da aplicação de Gestão de Cursos AKCIT, construído utilizando o framework NestJS. Serve como um checklist de progresso e guia de implementação para todas as funcionalidades.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+🎯 Status Atual do Projeto
 
-## Description
+Tarefa
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Status
 
-## Project setup
+Descrição
 
-```bash
-$ npm install
-```
+1.1. Inicialização do Projeto
 
-## Compile and run the project
+✅ Concluída
 
-```bash
-# development
-$ npm run start
+Projeto NestJS inicializado na pasta backend/.
 
-# watch mode
-$ npm run start:dev
+1.2. Configuração de Variáveis de Ambiente
 
-# production mode
-$ npm run start:prod
-```
+⬜ Pendente
 
-## Run tests
+Configurar o NestJS Config.
 
-```bash
-# unit tests
-$ npm run test
+1.3. Conexão com o Banco de Dados
 
-# e2e tests
-$ npm run test:e2e
+⬜ Pendente
 
-# test coverage
-$ npm run test:cov
-```
+Configurar o ORM (Prisma/TypeORM).
 
-## Deployment
+...
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Próximas tarefas detalhadas abaixo.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+1. Configuração de Ambiente & Arquitetura (Core Setup)
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+Task
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Descrição
 
-## Resources
+Aceite
 
-Check out a few resources that may come in handy when working with NestJS:
+[ ]
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+[Setup] Inicializar o projeto backend
 
-## Support
+Configurar a base do projeto com NestJS. Incluir a estrutura de pastas inicial.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+O projeto roda localmente (npm run start:dev), e um endpoint de health check (GET /) retorna status 200 OK.
 
-## Stay in touch
+[ ]
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+[Setup] Configurar a gestão de variáveis de ambiente
 
-## License
+Criar arquivos .env e .env.example. Integrar com o @nestjs/config para ler configurações.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+As configurações da aplicação (porta, URL do banco) são lidas a partir de process.env.
+
+[ ]
+
+[Setup] Configurar a conexão com o banco de dados e ORM
+
+Instalar e configurar um ORM (ex: Prisma ou TypeORM) e estabelecer a conexão com PostgreSQL.
+
+A aplicação consegue se conectar ao banco de dados com sucesso na inicialização.
+
+[ ]
+
+[Setup] Modelagem de Dados Inicial (Schema)
+
+Definir os schemas iniciais para: User, Course, Task. Incluir campos e relacionamentos básicos.
+
+Os schemas são criados e uma migração inicial do banco é gerada e executada com sucesso.
+
+[ ]
+
+[Setup] Configurar ESLint e Prettier
+
+Garantir que as regras de lint e formatação de código sejam aplicadas para manter a consistência do código.
+
+O comando npm run lint roda sem erros e o código é formatado automaticamente ao salvar.
+
+[ ]
+
+[Setup] Implementar logging e tratamento de erros global
+
+Criar um filtro de exceção global para padronizar as respostas de erro ({ statusCode, message, error }) e registrar logs.
+
+Um erro não tratado resulta em uma resposta JSON formatada com status 500, em vez de crashar o servidor.
+
+2. Autenticação & Autorização
+
+Task
+
+Descrição
+
+Aceite
+
+[ ]
+
+[Auth] Criar o schema do User com perfil (role)
+
+Expandir o schema do User para incluir password (hash) e um campo role (enum: ADMIN, PRODUTOR).
+
+O modelo User no banco de dados reflete esses campos.
+
+[ ]
+
+[Auth] Implementar endpoint de autenticação (POST /auth/login)
+
+Criar a rota que valida email/senha, compara o hash e, se bem-sucedido, gera e retorna um token JWT.
+
+1. Com credenciais válidas, retorna um token JWT e status 200. 2. Com credenciais inválidas, retorna um erro 401 Unauthorized.
+
+[ ]
+
+[Auth] Implementar middleware de proteção de rotas (JWT Guard)
+
+Criar um Guard que extrai o token JWT do header, verifica sua validade e anexa os dados do usuário (userId, role) ao objeto request.
+
+Rotas protegidas com este Guard retornam 401 Unauthorized se o token for inválido ou ausente.
+
+[ ]
+
+[Auth] Implementar endpoint para obter dados do usuário logado (GET /auth/me)
+
+Criar um endpoint protegido que usa o JWT Guard para identificar o usuário e retornar seus dados (exceto a senha).
+
+Acessar GET /auth/me com um token válido retorna os dados do usuário correspondente.
+
+[ ]
+
+[Auth] Implementar middleware de controle de acesso (RBAC Guard)
+
+Criar um Guard que verifica o perfil (role) do usuário para restringir o acesso a rotas específicas (ex: apenas ADMIN).
+
+Um usuário com perfil PRODUTOR recebe 403 Forbidden ao tentar acessar uma rota protegida para ADMIN.
+
+3. Feature: Dashboard & Gestão de Cursos
+
+Task
+
+Descrição
+
+Aceite
+
+[ ]
+
+[Model] Modelar entidade Course
+
+Definir o schema completo para Course, incluindo title, description, status (enum), startDate, targetDate, category, e o relacionamento many-to-many com User (membros da equipe).
+
+O schema do Course e sua tabela de junção com User são criados via migração.
+
+[ ]
+
+[Feature] Implementar CRUD para Course
+
+Criar os endpoints RESTful para gerenciar cursos (POST, GET, PUT, DELETE).
+
+Todos os endpoints estão funcionais, protegidos por autenticação, e as operações de escrita são restritas por perfil.
+
+[ ]
+
+[Feature] Implementar endpoint para o Dashboard Kanban (GET /dashboard/cursos)
+
+Criar um endpoint otimizado que retorna todos os cursos formatados para renderização do Kanban, agrupáveis por status.
+
+O endpoint retorna um array de cursos com os dados essenciais para os cards do Kanban.
+
+[ ]
+
+[Feature] Implementar endpoint de atualização de status (PATCH /cursos/:id/status)
+
+Criar o endpoint que recebe um novo status, valida a transição de estado e atualiza o curso no banco.
+
+A requisição PATCH atualiza o status do curso e retorna o curso atualizado.
+
+[ ]
+
+[Feature] Implementar endpoints de gestão de membros do curso
+
+Criar rotas para associar e desassociar usuários de um curso (POST /cursos/:id/membros, DELETE /cursos/:id/membros/:userId).
+
+As operações refletem corretamente a associação na tabela de junção.
+
+4. Feature: Gestão de Tarefas & Detalhes
+
+Task
+
+Descrição
+
+Aceite
+
+[ ]
+
+[Model] Modelar entidades Task, Subtask, Comment, ActivityLog
+
+Definir os schemas para Task, Subtask (relacionado a Task), Comment (relacionado a Task e User) e ActivityLog (para rastreamento de mudanças).
+
+Todos os schemas e seus relacionamentos são criados via migração do banco de dados.
+
+[ ]
+
+[Feature] Implementar CRUD para Task
+
+Criar os endpoints RESTful para gerenciar tarefas. O listagem (GET /tarefas) deve suportar filtros por query params (ex: ?responsavelId=..., ?status=...).
+
+É possível criar, listar (com filtros), obter, atualizar e excluir tarefas através da API.
+
+[ ]
+
+[Feature] Implementar CRUD para Subtask
+
+Criar endpoints para gerenciar subtarefas (POST /tarefas/:id/subtarefas, PATCH /subtarefas/:subtaskId, DELETE /subtarefas/:subtaskId).
+
+As operações de subtarefas funcionam e estão corretamente associadas à tarefa pai.
+
+[ ]
+
+[Feature] Implementar endpoint de Comentários (POST /tarefas/:id/comentarios)
+
+Criar um endpoint para adicionar um comentário a uma tarefa, associando o comentário ao userId do token.
+
+Um novo comentário é salvo no banco com o conteúdo, taskId e userId corretos.
+
+[ ]
+
+[Feature] Implementar lógica de logging de atividade
+
+Integrar a criação de registros na tabela ActivityLog nos serviços que modificam entidades importantes (ex: mudança de status de Task).
+
+Alterar o status de uma tarefa cria um registro em ActivityLog com a descrição da mudança.
+
+[ ]
+
+[Feature] Implementar o cálculo de Progresso (%) na API
+
+No serviço que busca uma tarefa (GET /tarefas/:id), calcular dinamicamente o progresso com base nas subtarefas concluídas versus o total de subtarefas.
+
+O JSON de retorno para GET /tarefas/:id inclui um campo progresso calculado (ex: 0.5 para 50%).
+
+5. Feature: Gestão de Arquivos (Attachments) - (MVP Sprint 2)
+
+Task
+
+Descrição
+
+Aceite
+
+[ ]
+
+[Model] Modelar entidade Attachment
+
+Criar o schema para Attachment, incluindo filename, path/url, mimetype, size, version, e relacionamento com Task e User.
+
+O novo schema é criado no banco de dados.
+
+[ ]
+
+[Feature] Implementar Upload de Arquivos (POST /tarefas/:id/anexos)
+
+Criar o endpoint que recebe arquivos, salva-os em um sistema de armazenamento (local/cloud) e registra o metadado no banco de dados.
+
+É possível fazer upload de um arquivo e ver seu registro na tarefa.
+
+[ ]
+
+[Feature] Implementar Download de Arquivos (GET /tarefas/:id/anexos/:anexoId)
+
+Criar o endpoint para servir o arquivo (stream) ao usuário, garantindo proteção por autenticação.
+
+Um usuário autenticado pode baixar o arquivo anexado.
+
+[ ]
+
+[Feature] Implementar Controle de Versão (Subida de Nova Versão)
+
+Criar lógica no endpoint de upload que, ao receber um arquivo com o mesmo nome e contexto, incrementa a versão e marca a versão anterior como inativa.
+
+O histórico de versões do arquivo pode ser rastreado no banco.
+
+6. Feature: Telas de Gestão & Relatórios
+
+Task
+
+Descrição
+
+Aceite
+
+[ ]
+
+[Model] Modelar LibraryItem e Formation
+
+Criar os schemas para LibraryItem (título, url, categoria) e Formation.
+
+As novas tabelas são criadas no banco de dados via migração.
+
+[ ]
+
+[Feature] Implementar CRUD para LibraryItem
+
+Criar os endpoints RESTful (POST, GET, PUT, DELETE) para a entidade LibraryItem.
+
+A gestão completa de itens da biblioteca é possível via API.
+
+[ ]
+
+[Feature] Implementar CRUD para Formation
+
+Criar os endpoints RESTful (POST, GET, PUT, DELETE) para a entidade Formation.
+
+A gestão completa de formações é possível via API.
+
+[ ]
+
+[Feature] Implementar CRUD para User (Admin only)
+
+Criar os endpoints RESTful (POST, GET, PUT, DELETE) em /admin/usuarios. Todas as rotas devem ser protegidas por RBAC Guard (ADMIN apenas).
+
+Um administrador pode criar, listar, editar (incluindo o perfil) e excluir usuários.
+
+[ ]
+
+[Feature] Implementar Relatório Semanal (GET /relatorios/semanal)
+
+Criar um endpoint otimizado para gerar as métricas de progresso (Tasks concluídas, em andamento, pendentes por Course), conforme solicitado no MVP.
+
+O endpoint retorna um JSON com dados sumarizados para o relatório.
+
+7. Qualidade & Deploy
+
+Task
+
+Descrição
+
+Aceite
+
+[ ]
+
+[Docs] Configurar documentação de API (Swagger/OpenAPI)
+
+Integrar a funcionalidade nativa do NestJS com o Swagger para gerar documentação da API automaticamente a partir dos decorators.
+
+Uma rota /api-docs está disponível e exibe uma UI interativa da documentação da API.
+
+[ ]
+
+[Test] Implementar testes unitários e de integração
+
+Escrever testes para as lógicas de negócio críticas (services) e para os endpoints principais (ex: autenticação, CRUD de cursos).
+
+A suíte de testes (npm test) roda e cobre as funcionalidades essenciais.
+
+[ ]
+
+[Deploy] Configurar Docker para o ambiente de desenvolvimento
+
+Criar um Dockerfile e um docker-compose.yml para orquestrar a aplicação backend e o banco de dados.
+
+O comando docker-compose up inicia a aplicação e o banco de dados com sucesso.
+
+[ ]
+
+[Deploy] Preparar scripts para build e deploy de produção
+
+Configurar o package.json com scripts para construir a aplicação para produção (npm run build) e definir um pipeline de CI/CD básico.
+
+Um build de produção é gerado sem erros.
