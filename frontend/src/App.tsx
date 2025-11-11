@@ -8,7 +8,6 @@ import { initializeUserStore } from './store/useUserStore';
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  // Inicializar o store na primeira renderização
   useEffect(() => {
     initializeUserStore();
   }, []);
@@ -33,5 +32,7 @@ function App() {
     </div>
   );
 }
+
+export default App;
 
 export default App;
