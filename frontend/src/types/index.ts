@@ -48,3 +48,16 @@ export interface Course {
 
 export type FilterPeriod = 'Week' | 'Month' | 'Quarter' | 'Year';
 export type FilterFeedback = 'All' | 'Pending' | 'Completed';
+
+export type LibraryCategory = 'Documentation' | 'Tool' | 'Template' | 'Resource' | 'Guide' | 'Article';
+
+export interface LibraryItem {
+  id: string;
+  title: string;
+  url: string;
+  category: LibraryCategory;
+  tags: string[];
+  description?: string;
+  addedAt: Date;
+  addedBy: string;
+}

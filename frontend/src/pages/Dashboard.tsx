@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import FilterBar from '../components/FilterBar';
 import CourseCard from '../components/CourseCard';
 import CourseDetailsModal from '../components/CourseDetailsModal';
+import Calendar from '../components/Calendar';
 import { mockCourses } from '../data/mockData';
 import { Course, FilterPeriod } from '../types';
 
