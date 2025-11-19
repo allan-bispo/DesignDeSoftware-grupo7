@@ -18,16 +18,31 @@ class HttpClient {
     this.baseURL = baseURL;
   }
 
+  /**
+   * Retorna os headers para a requisição, incluindo o token JWT se disponível
+   */
+  private getHeaders(customHeaders?: HeadersInit): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...customHeaders,
+    };
+
+    // Adiciona o token JWT se existir
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+    }
+
+    return headers;
+  }
+
   private async request<T>(
     endpoint: string,
     options?: RequestInit
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    
-    const headers = {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    };
+
+    const headers = this.getHeaders(options?.headers);
 
     try {
       const response = await fetch(url, {
@@ -36,10 +51,32 @@ class HttpClient {
       });
 
       if (!response.ok) {
+        // Tratamento específico para erro 401 (não autorizado)
+        if (response.status === 401) {
+          // Limpa o token inválido
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user');
+
+          throw new ApiError(
+            response.status,
+            response.statusText,
+            'Sessão expirada. Por favor, faça login novamente.'
+          );
+        }
+
+        // Tenta extrair mensagem de erro do corpo da resposta
+        let errorMessage = `Erro na requisição: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch {
+          // Se não conseguir parsear o JSON, usa a mensagem padrão
+        }
+
         throw new ApiError(
           response.status,
           response.statusText,
-          `Erro na requisição: ${response.statusText}`
+          errorMessage
         );
       }
 
@@ -49,7 +86,7 @@ class HttpClient {
       if (error instanceof ApiError) {
         throw error;
       }
-      
+
       throw new ApiError(
         0,
         'Network Error',

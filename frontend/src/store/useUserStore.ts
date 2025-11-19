@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { UserStore, User } from './types';
+import { authService } from '../services/authService';
+import { ApiError } from '../services/api';
 
 /**
  * Store global de usuário e autenticação
@@ -17,52 +19,56 @@ export const useUserStore = create<UserStore>((set) => ({
     try {
       set({ isLoading: true, error: null });
 
-      // Simulação de chamada à API
-      // Em produção, seria uma chamada real ao backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Validar credenciais (simulado)
+      // Validação básica
       if (!email || !password) {
         throw new Error('Email e senha são obrigatórios');
       }
 
-      // Criar usuário simulado
-      const mockUser: User = {
-        id: '1',
-        name: email.split('@')[0],
-        email: email,
-        role: 'student',
-        avatar: `https://ui-avatars.com/api/?name=${email}&background=random`,
-        createdAt: new Date(),
+      // Chamada real ao backend
+      const response = await authService.login(email, password);
+
+      // Converter dados do usuário do backend para o formato interno
+      const user: User = {
+        id: response.user.id,
+        name: response.user.name,
+        email: response.user.email,
+        role: response.user.role,
+        avatar: response.user.avatar,
+        createdAt: new Date(), // Backend pode retornar esta data também se disponível
       };
 
       set({
-        user: mockUser,
+        user,
         isAuthenticated: true,
         isLoading: false,
         error: null,
       });
-
-      // Salvar no localStorage para persistência
-      localStorage.setItem('user', JSON.stringify(mockUser));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro ao fazer login';
+      let errorMessage = 'Erro ao fazer login';
+
+      if (error instanceof ApiError) {
+        errorMessage = error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       set({
         error: errorMessage,
         isLoading: false,
         isAuthenticated: false,
+        user: null,
       });
       throw error;
     }
   },
 
   logout: () => {
+    authService.logout();
     set({
       user: null,
       isAuthenticated: false,
       error: null,
     });
-    localStorage.removeItem('user');
   },
 
   register: async (name: string, email: string, password: string, role: string) => {
@@ -129,17 +135,27 @@ export const useUserStore = create<UserStore>((set) => ({
  * Deve ser chamado uma vez no componente raiz
  */
 export const initializeUserStore = () => {
-  const savedUser = localStorage.getItem('user');
-  if (savedUser) {
+  const savedUser = authService.getUser();
+  const hasToken = authService.hasToken();
+
+  if (savedUser && hasToken) {
     try {
-      const user = JSON.parse(savedUser) as User;
+      // Converte a data de string para Date se necessário
+      const user: User = {
+        ...savedUser,
+        createdAt: new Date(savedUser.createdAt || new Date()),
+      };
+
       useUserStore.setState({
         user,
         isAuthenticated: true,
       });
     } catch (error) {
       console.error('Erro ao recuperar usuário do localStorage:', error);
-      localStorage.removeItem('user');
+      authService.logout();
     }
+  } else {
+    // Se não tiver token ou usuário, limpa tudo
+    authService.logout();
   }
 };

@@ -60,3 +60,25 @@ export interface CourseStats {
   delayed: number;
   averageCompletion: number;
 }
+
+// Auth types
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: 'admin' | 'instructor' | 'student';
+    avatar?: string;
+  };
+}
+
+export interface AuthError {
+  message: string;
+  statusCode: number;
+}
