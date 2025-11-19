@@ -41,14 +41,29 @@ No modo mockado, você pode usar qualquer credencial:
 
 | Email | Senha | Role Atribuído |
 |-------|-------|----------------|
-| admin@email.com | qualquer (min 3 chars) | admin |
-| professor@email.com | qualquer (min 3 chars) | instructor |
-| usuario@email.com | qualquer (min 3 chars) | student |
+| admin@email.com | qualquer (min 3 chars) | Admin |
+| produtor@email.com | qualquer (min 3 chars) | Produtor |
+| usuario@email.com | qualquer (min 3 chars) | Produtor |
 
 **Dica:** O role é determinado pelo email:
-- Contém "admin" → role: admin
-- Contém "professor" ou "instructor" → role: instructor
-- Outros → role: student
+- Contém "admin" → role: Admin (acesso total)
+- Outros → role: Produtor (acesso limitado)
+
+## Perfis e Permissões (RBAC)
+
+O sistema implementa controle de acesso baseado em roles:
+
+### Admin
+- Acesso total ao sistema
+- Pode ver e acessar **Gestão de Usuários**
+- Vê todos os itens do menu
+
+### Produtor
+- Acesso às funcionalidades padrão
+- **NÃO pode** ver ou acessar Gestão de Usuários
+- Menu filtrado automaticamente
+
+📖 Para mais detalhes sobre RBAC, veja: [RBAC_README.md](./RBAC_README.md)
 
 ## Fluxo de Autenticação
 

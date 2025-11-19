@@ -2,11 +2,13 @@
  * Tipos para o estado global da aplicação
  */
 
+export type UserRole = 'Admin' | 'Produtor';
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'instructor' | 'student';
+  role: UserRole;
   avatar?: string;
   createdAt: Date;
 }

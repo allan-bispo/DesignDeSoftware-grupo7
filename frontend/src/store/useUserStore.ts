@@ -88,7 +88,7 @@ export const useUserStore = create<UserStore>((set) => ({
         id: Math.random().toString(36).substr(2, 9),
         name,
         email,
-        role: role as 'admin' | 'instructor' | 'student',
+        role: role as 'Admin' | 'Produtor',
         avatar: `https://ui-avatars.com/api/?name=${name}&background=random`,
         createdAt: new Date(),
       };

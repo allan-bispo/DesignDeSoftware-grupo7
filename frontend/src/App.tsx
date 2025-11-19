@@ -2,12 +2,14 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
+import RoleGuard from './components/RoleGuard';
 import LayoutPrivado from './layouts/LayoutPrivado';
 import LayoutPublico from './layouts/LayoutPublico';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
 import Library from './pages/Library';
+import UserManagement from './pages/UserManagement';
 import { initializeUserStore } from './store/useUserStore';
 
 function App() {
@@ -36,6 +38,11 @@ function App() {
             <Route path="/library" element={<Library />} />
             <Route path="/team" element={<div className="p-8"><h1 className="text-2xl font-bold">Team</h1></div>} />
             <Route path="/analytics" element={<div className="p-8"><h1 className="text-2xl font-bold">Analytics</h1></div>} />
+
+            {/* Rotas protegidas por role - Apenas Admin */}
+            <Route element={<RoleGuard allowedRoles={['Admin']} />}>
+              <Route path="/user-management" element={<UserManagement />} />
+            </Route>
           </Route>
         </Route>
 

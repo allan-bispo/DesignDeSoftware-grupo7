@@ -73,7 +73,7 @@ export interface LoginResponse {
     id: string;
     name: string;
     email: string;
-    role: 'admin' | 'instructor' | 'student';
+    role: 'Admin' | 'Produtor';
     avatar?: string;
   };
 }

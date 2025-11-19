@@ -1,18 +1,67 @@
-import { LayoutDashboard, BookOpen, Users, BarChart3, Library, LogOut } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Users, BarChart3, Library, LogOut, Shield } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/useUserStore';
+import { usePermissions } from '../hooks/usePermissions';
+import { UserRole } from '../store/types';
+
+interface MenuItem {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+  path: string;
+  allowedRoles?: UserRole[]; // Se não especificado, todos podem ver
+}
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const logout = useUserStore((state) => state.logout);
+  const { hasRole } = usePermissions();
 
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-    { id: 'courses', label: 'Courses', icon: BookOpen, path: '/courses' },
-    { id: 'library', label: 'Library', icon: Library, path: '/library' },
-    { id: 'team', label: 'Team', icon: Users, path: '/team' },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3, path: '/analytics' },
+  const menuItems: MenuItem[] = [
+    {
+      id: 'dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      path: '/dashboard'
+    },
+    {
+      id: 'courses',
+      label: 'Courses',
+      icon: BookOpen,
+      path: '/courses'
+    },
+    {
+      id: 'library',
+      label: 'Library',
+      icon: Library,
+      path: '/library'
+    },
+    {
+      id: 'team',
+      label: 'Team',
+      icon: Users,
+      path: '/team'
+    },
+    {
+      id: 'analytics',
+      label: 'Analytics',
+      icon: BarChart3,
+      path: '/analytics'
+    },
+    {
+      id: 'user-management',
+      label: 'Gestão de Usuários',
+      icon: Shield,
+      path: '/user-management',
+      allowedRoles: ['Admin'] // Apenas Admin pode ver
+    },
   ];
+
+  // Filtra os itens de menu baseado nas permissões do usuário
+  const visibleMenuItems = menuItems.filter((item) => {
+    if (!item.allowedRoles) return true; // Se não tem restrição, todos podem ver
+    return hasRole(item.allowedRoles); // Verifica se o usuário tem permissão
+  });
 
   const handleLogout = () => {
     logout();
@@ -31,7 +80,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="p-4 flex-1 overflow-y-auto">
-        {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
           const Icon = item.icon;
 
           return (
