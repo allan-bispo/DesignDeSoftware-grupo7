@@ -181,6 +181,7 @@ interface CategoryTagProps {
   removable?: boolean;
   onRemove?: () => void;
   onClick?: () => void;
+  icon?: React.ReactNode;
 }
 
 export const CategoryTag = ({
@@ -191,6 +192,7 @@ export const CategoryTag = ({
   removable = false,
   onRemove,
   onClick,
+  icon,
 }: CategoryTagProps) => {
   return (
     <Tag
@@ -200,6 +202,7 @@ export const CategoryTag = ({
       removable={removable}
       onRemove={onRemove}
       onClick={onClick}
+      icon={icon}
     >
       {category}
     </Tag>

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Plus, Bell, User, LogOut, Settings } from 'lucide-react';
+import { Plus, Bell, LogOut, Settings } from 'lucide-react';
 import { useUserStore } from '../store/useUserStore';
 import UserAuthModal from './UserAuthModal';
+import Avatar from './Avatar';
 
 export default function Header() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -45,20 +46,14 @@ export default function Header() {
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
+                className="hover:opacity-80 transition-opacity"
                 title={isAuthenticated && user ? `${user.name}` : 'Fazer login'}
               >
-                {isAuthenticated && user?.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <User size={18} className="text-primary-600" />
-                  </div>
-                )}
+                <Avatar
+                  src={user?.avatar}
+                  name={user?.name}
+                  size="sm"
+                />
               </button>
 
               {/* Dropdown Menu */}
@@ -69,13 +64,11 @@ export default function Header() {
                       {/* Informações do Usuário */}
                       <div className="p-4 border-b border-gray-200">
                         <div className="flex items-center gap-3">
-                          {user.avatar && (
-                            <img
-                              src={user.avatar}
-                              alt={user.name}
-                              className="w-10 h-10 rounded-full"
-                            />
-                          )}
+                          <Avatar
+                            src={user.avatar}
+                            name={user.name}
+                            size="md"
+                          />
                           <div>
                             <p className="font-semibold text-gray-900">{user.name}</p>
                             <p className="text-sm text-gray-600">{user.email}</p>

@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp, User, Clock, BookOpen, ExternalLink } from 'lucide-react';
 import { Course } from '../types';
 import { format } from 'date-fns';
+import Tag, { TagVariant } from './Tag';
 
 interface CourseCardProps {
   course: Course;
@@ -9,16 +10,16 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course, onToggleExpand, onOpenDetails }: CourseCardProps) {
-  const getTrainingTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-      Frontend: 'bg-blue-100 text-blue-700',
-      Backend: 'bg-green-100 text-green-700',
-      Fullstack: 'bg-purple-100 text-purple-700',
-      DevOps: 'bg-orange-100 text-orange-700',
-      Mobile: 'bg-pink-100 text-pink-700',
-      'Data Science': 'bg-cyan-100 text-cyan-700',
+  const getTrainingTypeVariant = (type: string): TagVariant => {
+    const variants: Record<string, TagVariant> = {
+      Frontend: 'info',
+      Backend: 'success',
+      Fullstack: 'purple',
+      DevOps: 'orange',
+      Mobile: 'pink',
+      'Data Science': 'primary',
     };
-    return colors[type] || 'bg-gray-100 text-gray-700';
+    return variants[type] || 'default';
   };
 
   const getCompletionColor = (completion: number) => {
@@ -81,9 +82,9 @@ export default function CourseCard({ course, onToggleExpand, onOpenDetails }: Co
           
           <div>
             <p className="text-xs text-gray-500 mb-1">Training Type</p>
-            <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getTrainingTypeColor(course.trainingType)}`}>
+            <Tag variant={getTrainingTypeVariant(course.trainingType)} size="sm">
               {course.trainingType}
-            </span>
+            </Tag>
           </div>
         </div>
 

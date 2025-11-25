@@ -1,8 +1,9 @@
+import { BookOpen, ChevronDown, ChevronUp, ExternalLink, FileCode, FileText, FolderOpen, Newspaper, Search, Tag as TagIcon, Wrench } from 'lucide-react';
 import { useState } from 'react';
-import { ExternalLink, Search, Tag, FileText, Wrench, FileCode, BookOpen, Newspaper, FolderOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import Header from '../components/Header';
+import { CategoryTag } from '../components/Tag';
 import { mockLibraryItems } from '../data/mockData';
-import { LibraryItem, LibraryCategory } from '../types';
+import { LibraryCategory } from '../types';
 
 export default function Library() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -112,7 +113,7 @@ export default function Library() {
                 className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <Tag size={16} className="text-gray-600" />
+                  <TagIcon size={16} className="text-gray-600" />
                   <span className="text-sm font-medium text-gray-700">
                     Filter by tags
                     {selectedTags.length > 0 && (
@@ -135,18 +136,15 @@ export default function Library() {
                     {allTags.map(tag => {
                       const isSelected = selectedTags.includes(tag);
                       return (
-                        <button
+                        <CategoryTag
                           key={tag}
+                          category={tag}
+                          variant={isSelected ? 'primary' : 'default'}
+                          size="sm"
+                          outlined={!isSelected}
                           onClick={() => toggleTag(tag)}
-                          className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                            isSelected
-                              ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
-                          }`}
-                        >
-                          <Tag size={12} />
-                          {tag}
-                        </button>
+                          icon={<TagIcon size={12} />}
+                        />
                       );
                     })}
                   </div>
@@ -195,13 +193,13 @@ export default function Library() {
 
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {item.tags.map(tag => (
-                    <span
+                    <CategoryTag
                       key={tag}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs"
-                    >
-                      <Tag size={10} />
-                      {tag}
-                    </span>
+                      category={tag}
+                      variant="default"
+                      size="sm"
+                      icon={<TagIcon size={10} />}
+                    />
                   ))}
                 </div>
 

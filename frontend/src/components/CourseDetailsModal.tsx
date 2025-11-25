@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { X, Link as LinkIcon, Plus, MessageSquare, History, ExternalLink, Trash2, Calendar, User, Clock } from 'lucide-react';
 import { Course, UsefulLink, Comment } from '../types';
 import { format } from 'date-fns';
+import Tag, { TagVariant } from './Tag';
+import Avatar from './Avatar';
 
 interface CourseDetailsModalProps {
   course: Course;
@@ -96,16 +98,16 @@ export default function CourseDetailsModal({ course, isOpen, onClose, onUpdateCo
     setNewComment('');
   };
 
-  const getTrainingTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-      Frontend: 'bg-blue-100 text-blue-700',
-      Backend: 'bg-green-100 text-green-700',
-      Fullstack: 'bg-purple-100 text-purple-700',
-      DevOps: 'bg-orange-100 text-orange-700',
-      Mobile: 'bg-pink-100 text-pink-700',
-      'Data Science': 'bg-cyan-100 text-cyan-700',
+  const getTrainingTypeVariant = (type: string): TagVariant => {
+    const variants: Record<string, TagVariant> = {
+      Frontend: 'info',
+      Backend: 'success',
+      Fullstack: 'purple',
+      DevOps: 'orange',
+      Mobile: 'pink',
+      'Data Science': 'primary',
     };
-    return colors[type] || 'bg-gray-100 text-gray-700';
+    return variants[type] || 'default';
   };
 
   const completedTasks = course.checklist.filter(item => item.completed).length;
@@ -119,9 +121,9 @@ export default function CourseDetailsModal({ course, isOpen, onClose, onUpdateCo
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <h2 className="text-2xl font-semibold text-gray-900">{course.name}</h2>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getTrainingTypeColor(course.trainingType)}`}>
+              <Tag variant={getTrainingTypeVariant(course.trainingType)} size="sm">
                 {course.trainingType}
-              </span>
+              </Tag>
             </div>
             <p className="text-gray-600">{course.description}</p>
           </div>
@@ -386,13 +388,18 @@ export default function CourseDetailsModal({ course, isOpen, onClose, onUpdateCo
                       key={comment.id}
                       className="p-4 bg-white border border-gray-200 rounded-lg"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-gray-900">{comment.author}</span>
-                        <span className="text-xs text-gray-500">
-                          {format(comment.createdAt, 'dd/MM/yyyy HH:mm')}
-                        </span>
+                      <div className="flex items-start gap-3 mb-2">
+                        <Avatar name={comment.author} size="sm" />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium text-gray-900">{comment.author}</span>
+                            <span className="text-xs text-gray-500">
+                              {format(comment.createdAt, 'dd/MM/yyyy HH:mm')}
+                            </span>
+                          </div>
+                          <p className="text-gray-700 text-sm">{comment.content}</p>
+                        </div>
                       </div>
-                      <p className="text-gray-700 text-sm">{comment.content}</p>
                     </div>
                   ))
                 ) : (
