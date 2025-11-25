@@ -16,8 +16,8 @@ async function bootstrap() {
     }),
   );
 
-  // Define um prefixo global para todas as rotas (ex: /api/v1/cursos)
-  // app.setGlobalPrefix('api/v1');
+  // Define um prefixo global para todas as rotas
+  app.setGlobalPrefix('api');
 
   // Habilita o CORS para que o frontend React possa aceder
   app.enableCors();
