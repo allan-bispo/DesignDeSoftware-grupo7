@@ -14,7 +14,7 @@ export class MicrocoursesService {
   ) {}
 
   async create(createMicrocourseDto: CreateMicrocourseDto): Promise<Microcourse> {
-    const microcourseData: any = {
+    const microcourseData: Partial<Microcourse> = {
       name: createMicrocourseDto.name,
       description: createMicrocourseDto.description,
       syllabus: createMicrocourseDto.syllabus,
@@ -30,15 +30,15 @@ export class MicrocoursesService {
     };
 
     if (createMicrocourseDto.thematicAreaId) {
-      microcourseData.thematicArea = { id: createMicrocourseDto.thematicAreaId };
+      microcourseData.thematicArea = { id: createMicrocourseDto.thematicAreaId } as any;
     }
 
     if (createMicrocourseDto.learningTrailId) {
-      microcourseData.learningTrail = { id: createMicrocourseDto.learningTrailId };
+      microcourseData.learningTrail = { id: createMicrocourseDto.learningTrailId } as any;
     }
 
     if (createMicrocourseDto.coordinatorId) {
-      microcourseData.coordinator = { id: createMicrocourseDto.coordinatorId };
+      microcourseData.coordinator = { id: createMicrocourseDto.coordinatorId } as any;
     }
 
     const microcourse = this.microcourseRepository.create(microcourseData);

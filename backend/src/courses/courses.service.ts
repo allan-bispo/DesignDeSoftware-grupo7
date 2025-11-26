@@ -196,6 +196,7 @@ export class CoursesService {
     ).length;
     const completed = courses.filter((c) => c.completion === 100).length;
     const delayed = courses.filter((c) => {
+      if (!c.expirationDate) return false;
       const expirationDate = new Date(c.expirationDate);
       expirationDate.setHours(0, 0, 0, 0);
       return expirationDate < today && c.completion < 100;
