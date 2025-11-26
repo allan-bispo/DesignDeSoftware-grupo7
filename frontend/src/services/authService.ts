@@ -34,9 +34,11 @@ class AuthService {
     const mockToken = `mock.jwt.token.${Date.now()}`;
 
     // Determina o role baseado no email (apenas para fins de demonstração)
-    let role: 'Admin' | 'Produtor' = 'Produtor';
+    let role: 'admin' | 'instructor' | 'student' = 'student';
     if (email.includes('admin')) {
-      role = 'Admin';
+      role = 'admin';
+    } else if (email.includes('instructor') || email.includes('produtor')) {
+      role = 'instructor';
     }
 
     // Cria resposta mockada no formato esperado

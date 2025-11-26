@@ -6,18 +6,6 @@ export class CourseFiltersDto {
   @IsOptional()
   search?: string;
 
-  @IsString()
-  @IsOptional()
-  responsible?: string;
-
-  @IsString()
-  @IsOptional()
-  trainingType?: string;
-
-  @IsString()
-  @IsOptional()
-  period?: string;
-
   @Type(() => Number)
   @IsNumber()
   @Min(1)

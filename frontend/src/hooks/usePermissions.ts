@@ -21,14 +21,21 @@ export function usePermissions() {
    * Verifica se o usuário é Admin
    */
   const isAdmin = (): boolean => {
-    return user?.role === 'Admin';
+    return user?.role === 'admin';
   };
 
   /**
-   * Verifica se o usuário é Produtor
+   * Verifica se o usuário é Instructor (Produtor de conteúdo)
    */
-  const isProdutor = (): boolean => {
-    return user?.role === 'Produtor';
+  const isInstructor = (): boolean => {
+    return user?.role === 'instructor';
+  };
+
+  /**
+   * Verifica se o usuário é Student
+   */
+  const isStudent = (): boolean => {
+    return user?.role === 'student';
   };
 
   /**
@@ -41,8 +48,11 @@ export function usePermissions() {
   return {
     hasRole,
     isAdmin,
-    isProdutor,
+    isInstructor,
+    isStudent,
     getCurrentRole,
     user,
+    // Backwards compatibility aliases
+    isProdutor: isInstructor,
   };
 }

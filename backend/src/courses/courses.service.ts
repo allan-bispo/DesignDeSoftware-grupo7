@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Course, TrainingType } from './entities/course.entity';
+import { Course } from './entities/course.entity';
 import { ChecklistItem } from './entities/checklist-item.entity';
-import { ActionHistory } from './entities/action-history.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CourseFiltersDto } from './dto/course-filters.dto';
@@ -15,43 +14,30 @@ export class CoursesService {
     private readonly courseRepository: Repository<Course>,
     @InjectRepository(ChecklistItem)
     private readonly checklistRepository: Repository<ChecklistItem>,
-    @InjectRepository(ActionHistory)
-    private readonly actionHistoryRepository: Repository<ActionHistory>,
   ) {}
 
   async create(createCourseDto: CreateCourseDto): Promise<Course> {
     const course = this.courseRepository.create({
       name: createCourseDto.name,
       description: createCourseDto.description,
-      responsible: createCourseDto.responsible,
-      trainingType: createCourseDto.trainingType as TrainingType,
-      deliveryDate: new Date(createCourseDto.deliveryDate),
-      duration: createCourseDto.duration,
-      modules: createCourseDto.modules,
-      projectNotes: createCourseDto.projectNotes,
+      syllabus: createCourseDto.syllabus,
+      workload: createCourseDto.workload,
+      expirationDate: new Date(createCourseDto.expirationDate),
       completion: 0,
     });
 
     const savedCourse = await this.courseRepository.save(course);
 
-    // Cria checklist inicial
+    // Cria checklist inicial para determinar o andamento
     const checklistItems = [
-      { label: 'Folder/card do AVA', completed: false, course: savedCourse },
-      { label: 'Escrita do Ebook/Data', completed: false, course: savedCourse },
-      { label: 'Ilustrações Ebook', completed: false, course: savedCourse },
+      { label: 'Planejamento', completed: false, course: savedCourse },
+      { label: 'Desenvolvimento do Conteúdo', completed: false, course: savedCourse },
+      { label: 'Revisão', completed: false, course: savedCourse },
+      { label: 'Publicação', completed: false, course: savedCourse },
     ];
     await this.checklistRepository.save(
       checklistItems.map((item) => this.checklistRepository.create(item)),
     );
-
-    // Cria histórico de ação
-    const actionHistory = this.actionHistoryRepository.create({
-      action: 'Curso criado',
-      user: createCourseDto.responsible,
-      timestamp: new Date(),
-      course: savedCourse,
-    });
-    await this.actionHistoryRepository.save(actionHistory);
 
     return this.findOne(savedCourse.id);
   }
@@ -59,9 +45,6 @@ export class CoursesService {
   async findAll(filters: CourseFiltersDto) {
     const {
       search,
-      responsible,
-      trainingType,
-      period,
       page = 1,
       limit = 10,
     } = filters;
@@ -70,25 +53,9 @@ export class CoursesService {
 
     if (search) {
       queryBuilder.where(
-        '(course.name LIKE :search OR course.description LIKE :search)',
+        '(course.name LIKE :search OR course.description LIKE :search OR course.syllabus LIKE :search)',
         { search: `%${search}%` },
       );
-    }
-
-    if (responsible) {
-      queryBuilder.andWhere('course.responsible = :responsible', {
-        responsible,
-      });
-    }
-
-    if (trainingType) {
-      queryBuilder.andWhere('course.trainingType = :trainingType', {
-        trainingType,
-      });
-    }
-
-    if (period) {
-      // Implementar lógica de período se necessário
     }
 
     const skip = (page - 1) * limit;
@@ -100,11 +67,15 @@ export class CoursesService {
 
     const [data, total] = await queryBuilder.getManyAndCount();
 
-    // Garante que checklist sempre seja um array
+    // Garante que checklist sempre seja um array e recalcula completion
     data.forEach((course) => {
       if (!course.checklist) {
         course.checklist = [];
       }
+      // Recalcula completion baseado nos checkboxes
+      const totalItems = course.checklist.length;
+      const completedItems = course.checklist.filter((item) => item.completed).length;
+      course.completion = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
     });
 
     return {
@@ -121,17 +92,20 @@ export class CoursesService {
   async findOne(id: string): Promise<Course> {
     const course = await this.courseRepository.findOne({
       where: { id },
-      relations: ['checklist', 'usefulLinks', 'comments', 'actionHistory'],
+      relations: ['checklist'],
     });
 
     if (!course) {
       throw new NotFoundException(`Curso com ID ${id} não encontrado.`);
     }
 
-    // Garante que checklist sempre seja um array
+    // Garante que checklist sempre seja um array e recalcula completion
     if (!course.checklist) {
       course.checklist = [];
     }
+    const totalItems = course.checklist.length;
+    const completedItems = course.checklist.filter((item) => item.completed).length;
+    course.completion = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
     return course;
   }
@@ -146,26 +120,14 @@ export class CoursesService {
     if (updateCourseDto.description !== undefined) {
       course.description = updateCourseDto.description;
     }
-    if (updateCourseDto.responsible !== undefined) {
-      course.responsible = updateCourseDto.responsible;
+    if (updateCourseDto.syllabus !== undefined) {
+      course.syllabus = updateCourseDto.syllabus;
     }
-    if (updateCourseDto.trainingType !== undefined) {
-      course.trainingType = updateCourseDto.trainingType as TrainingType;
+    if (updateCourseDto.workload !== undefined) {
+      course.workload = updateCourseDto.workload;
     }
-    if (updateCourseDto.deliveryDate !== undefined) {
-      course.deliveryDate = new Date(updateCourseDto.deliveryDate);
-    }
-    if (updateCourseDto.duration !== undefined) {
-      course.duration = updateCourseDto.duration;
-    }
-    if (updateCourseDto.modules !== undefined) {
-      course.modules = updateCourseDto.modules;
-    }
-    if (updateCourseDto.projectNotes !== undefined) {
-      course.projectNotes = updateCourseDto.projectNotes;
-    }
-    if (updateCourseDto.completion !== undefined) {
-      course.completion = updateCourseDto.completion;
+    if (updateCourseDto.expirationDate !== undefined) {
+      course.expirationDate = new Date(updateCourseDto.expirationDate);
     }
 
     const updatedCourse = await this.courseRepository.save(course);
@@ -177,10 +139,56 @@ export class CoursesService {
     await this.courseRepository.remove(course);
   }
 
+  async updateChecklistItem(
+    courseId: string,
+    itemId: string,
+    completed: boolean,
+  ): Promise<Course> {
+    // Busca o curso
+    const course = await this.findOne(courseId);
+
+    // Atualiza o item da checklist
+    const checklistItem = await this.checklistRepository.findOne({
+      where: { id: itemId },
+    });
+
+    if (!checklistItem) {
+      throw new NotFoundException(
+        `Item da checklist com ID ${itemId} não encontrado.`,
+      );
+    }
+
+    checklistItem.completed = completed;
+    await this.checklistRepository.save(checklistItem);
+
+    // Recalcula a porcentagem de conclusão
+    const updatedCourse = await this.findOne(courseId);
+    const totalItems = updatedCourse.checklist.length;
+    const completedItems = updatedCourse.checklist.filter(
+      (item) => item.completed,
+    ).length;
+    const completion = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+    // Atualiza a porcentagem de conclusão do curso
+    updatedCourse.completion = completion;
+    await this.courseRepository.save(updatedCourse);
+
+    return this.findOne(courseId);
+  }
+
   async getStats() {
-    const courses = await this.courseRepository.find();
+    const courses = await this.courseRepository.find({
+      relations: ['checklist'],
+    });
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
+    // Recalcula completion para todos os cursos
+    courses.forEach((course) => {
+      const totalItems = course.checklist?.length || 0;
+      const completedItems = course.checklist?.filter((item) => item.completed).length || 0;
+      course.completion = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+    });
 
     const total = courses.length;
     const inProgress = courses.filter(
@@ -188,9 +196,9 @@ export class CoursesService {
     ).length;
     const completed = courses.filter((c) => c.completion === 100).length;
     const delayed = courses.filter((c) => {
-      const deliveryDate = new Date(c.deliveryDate);
-      deliveryDate.setHours(0, 0, 0, 0);
-      return deliveryDate < today && c.completion < 100;
+      const expirationDate = new Date(c.expirationDate);
+      expirationDate.setHours(0, 0, 0, 0);
+      return expirationDate < today && c.completion < 100;
     }).length;
 
     const averageCompletion =

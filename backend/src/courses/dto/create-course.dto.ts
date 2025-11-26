@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsDateString,
   IsNumber,
-  IsIn,
   Min,
 } from 'class-validator';
 
@@ -18,32 +17,13 @@ export class CreateCourseDto {
 
   @IsString()
   @IsNotEmpty()
-  responsible: string;
+  syllabus: string;
 
-  @IsString()
-  @IsIn([
-    'Frontend',
-    'Backend',
-    'Fullstack',
-    'DevOps',
-    'Mobile',
-    'Data Science',
-  ])
-  trainingType: string;
+  @IsNumber()
+  @Min(1)
+  workload: number;
 
   @IsDateString()
   @IsNotEmpty()
-  deliveryDate: string;
-
-  @IsString()
-  @IsNotEmpty()
-  duration: string;
-
-  @IsNumber()
-  @Min(0)
-  modules: number;
-
-  @IsString()
-  @IsNotEmpty()
-  projectNotes: string;
+  expirationDate: string;
 }

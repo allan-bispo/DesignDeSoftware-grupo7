@@ -127,3 +127,30 @@ export function useDeleteCourse(
     ...options,
   });
 }
+
+export function useUpdateChecklistItem(
+  options?: UseMutationOptions<
+    SingleResponse<Course>,
+    Error,
+    { courseId: string; itemId: string; completed: boolean }
+  >
+) {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    SingleResponse<Course>,
+    Error,
+    { courseId: string; itemId: string; completed: boolean }
+  >({
+    mutationFn: ({ courseId, itemId, completed }) =>
+      courseService.updateChecklistItem(courseId, itemId, completed),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: courseKeys.detail(variables.courseId),
+      });
+      queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: courseKeys.stats() });
+    },
+    ...options,
+  });
+}

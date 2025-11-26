@@ -33,9 +33,16 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
-    // Retorna o usuário sem a senha
+    // Gera o token JWT
+    const payload = { sub: user.id, email: user.email, role: user.role };
+    const token = this.jwtService.sign(payload);
+
+    // Retorna o token e usuário sem a senha
     const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    return {
+      token,
+      user: userWithoutPassword,
+    };
   }
 
   async register(registerDto: RegisterDto) {
@@ -61,8 +68,15 @@ export class AuthService {
 
     const savedUser = await this.userRepository.save(user);
 
-    // Retorna o usuário sem a senha
+    // Gera o token JWT
+    const payload = { sub: savedUser.id, email: savedUser.email, role: savedUser.role };
+    const token = this.jwtService.sign(payload);
+
+    // Retorna o token e usuário sem a senha
     const { password, ...userWithoutPassword } = savedUser;
-    return userWithoutPassword;
+    return {
+      token,
+      user: userWithoutPassword,
+    };
   }
 }

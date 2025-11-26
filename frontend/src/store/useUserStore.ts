@@ -88,7 +88,7 @@ export const useUserStore = create<UserStore>((set) => ({
         id: Math.random().toString(36).substr(2, 9),
         name,
         email,
-        role: role as 'Admin' | 'Produtor',
+        role: role as 'admin' | 'instructor' | 'student',
         avatar: `https://ui-avatars.com/api/?name=${name}&background=random`,
         createdAt: new Date(),
       };
@@ -143,8 +143,8 @@ export const initializeUserStore = () => {
       // Converte a data de string para Date se necessário
       const user: User = {
         ...savedUser,
-        createdAt: new Date(savedUser.createdAt || new Date()),
-      };
+        createdAt: savedUser.createdAt ? new Date(savedUser.createdAt) : new Date(),
+      } as User;
 
       useUserStore.setState({
         user,

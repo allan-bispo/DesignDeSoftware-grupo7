@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(git log:*)",
-      "Bash(git stash show:*)"
+      "Bash(git stash show:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

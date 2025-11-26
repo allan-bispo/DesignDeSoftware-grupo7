@@ -63,4 +63,18 @@ export class CoursesController {
   async remove(@Param('id') id: string): Promise<void> {
     await this.coursesService.remove(id);
   }
+
+  @Put(':courseId/checklist/:itemId')
+  async updateChecklistItem(
+    @Param('courseId') courseId: string,
+    @Param('itemId') itemId: string,
+    @Body() body: { completed: boolean },
+  ): Promise<SingleResponse<any>> {
+    const course = await this.coursesService.updateChecklistItem(
+      courseId,
+      itemId,
+      body.completed,
+    );
+    return { data: course };
+  }
 }

@@ -2,7 +2,7 @@
  * Tipos para o estado global da aplicação
  */
 
-export type UserRole = 'Admin' | 'Produtor';
+export type UserRole = 'admin' | 'instructor' | 'student';
 
 export interface User {
   id: string;

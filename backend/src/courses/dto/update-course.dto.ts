@@ -3,9 +3,7 @@ import {
   IsOptional,
   IsDateString,
   IsNumber,
-  IsIn,
   Min,
-  Max,
 } from 'class-validator';
 
 export class UpdateCourseDto {
@@ -19,40 +17,14 @@ export class UpdateCourseDto {
 
   @IsString()
   @IsOptional()
-  responsible?: string;
+  syllabus?: string;
 
-  @IsString()
-  @IsIn([
-    'Frontend',
-    'Backend',
-    'Fullstack',
-    'DevOps',
-    'Mobile',
-    'Data Science',
-  ])
+  @IsNumber()
+  @Min(1)
   @IsOptional()
-  trainingType?: string;
+  workload?: number;
 
   @IsDateString()
   @IsOptional()
-  deliveryDate?: string;
-
-  @IsString()
-  @IsOptional()
-  duration?: string;
-
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  modules?: number;
-
-  @IsString()
-  @IsOptional()
-  projectNotes?: string;
-
-  @IsNumber()
-  @Min(0)
-  @Max(100)
-  @IsOptional()
-  completion?: number;
+  expirationDate?: string;
 }

@@ -1,9 +1,22 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+
+// Módulos Existentes (legacy - serão gradualmente substituídos)
 import { AuthModule } from '../auth/auth.module';
 import { CoursesModule } from '../courses/courses.module';
 import { LibraryModule } from '../library/library.module';
+
+// Módulos AKCIT - Nova Arquitetura
+import { UsersModule } from '../users/users.module';
+import { PedagogicalProjectModule } from '../pedagogical-project/pedagogical-project.module';
+import { TeamManagementModule } from '../team-management/team-management.module';
+import { ContentProductionModule } from '../content-production/content-production.module';
+import { AvaManagementModule } from '../ava-management/ava-management.module';
+import { StudentInteractionModule } from '../student-interaction/student-interaction.module';
+import { EventsModule } from '../events/events.module';
+import { CertificatesModule } from '../certificates/certificates.module';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -20,12 +33,24 @@ import { AppService } from './app.service';
         type: configService.getOrThrow<string>('DATABASE_TYPE') as 'sqlite',
         database: configService.getOrThrow<string>('DATABASE_NAME'),
         entities: [__dirname + '/../**/*.entity.{js,ts}'],
-        synchronize: true,
+        synchronize: true, // ATENÇÃO: Desabilitar em produção
       }),
     }),
+
+    // Módulos Legacy (manter temporariamente para compatibilidade)
     AuthModule,
     CoursesModule,
     LibraryModule,
+
+    // Módulos AKCIT
+    UsersModule,
+    PedagogicalProjectModule,
+    TeamManagementModule,
+    ContentProductionModule,
+    AvaManagementModule,
+    StudentInteractionModule,
+    EventsModule,
+    CertificatesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -28,12 +28,12 @@ export default function Library() {
 
   const getCategoryColor = (category: LibraryCategory) => {
     const colors: Record<LibraryCategory, string> = {
-      Documentation: 'bg-blue-100 text-blue-700 border-blue-200',
-      Tool: 'bg-green-100 text-green-700 border-green-200',
-      Template: 'bg-purple-100 text-purple-700 border-purple-200',
-      Resource: 'bg-orange-100 text-orange-700 border-orange-200',
-      Guide: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-      Article: 'bg-pink-100 text-pink-700 border-pink-200',
+      Documentation: 'bg-blue-100 text-blue-700 border-blue-300',
+      Tool: 'bg-green-100 text-green-700 border-green-300',
+      Template: 'bg-purple-100 text-purple-700 border-purple-300',
+      Resource: 'bg-orange-100 text-orange-700 border-orange-300',
+      Guide: 'bg-cyan-100 text-cyan-700 border-cyan-300',
+      Article: 'bg-pink-100 text-pink-700 border-pink-300',
     };
     return colors[category];
   };
@@ -62,44 +62,46 @@ export default function Library() {
   const categories: Array<LibraryCategory | 'All'> = ['All', 'Documentation', 'Tool', 'Template', 'Resource', 'Guide', 'Article'];
 
   return (
-    <div className="flex-1 bg-gray-50">
+    <div className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
       <Header />
 
-      <main className="p-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Resource Library</h1>
-          <p className="text-gray-600">Your curated collection of tools, documentation, and resources</p>
+      <main className="p-8 max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Biblioteca de Recursos</h1>
+          <p className="text-gray-600">Sua coleção curada de ferramentas, documentação e recursos</p>
         </div>
 
         {/* Search and Filters */}
-        <div className="mb-6 space-y-4">
+        <div className="card p-6 mb-6 space-y-4">
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search resources by title, description, or tags..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Buscar recursos por título, descrição ou tags..."
+              className="input-field pl-11"
             />
           </div>
 
           {/* Category Filter */}
           <div className="flex flex-wrap gap-2">
-            {categories.map(category => {
+            {categories.map((category, index) => {
               const isActive = selectedCategory === category;
               return (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 animate-fade-in ${
                     isActive
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-medium transform scale-105'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-soft'
                   }`}
+                  style={{ animationDelay: `${index * 30}ms` }}
                 >
-                  {category}
+                  {category === 'All' ? 'Todos' : category}
                 </button>
               );
             })}
@@ -107,33 +109,35 @@ export default function Library() {
 
           {/* Tag Filter - Collapsible */}
           {allTags.length > 0 && (
-            <div className="border border-gray-300 rounded-lg overflow-hidden">
+            <div className="card overflow-hidden">
               <button
                 onClick={() => setIsTagsExpanded(!isTagsExpanded)}
-                className="w-full flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors group"
               >
                 <div className="flex items-center gap-2">
-                  <TagIcon size={16} className="text-gray-600" />
-                  <span className="text-sm font-medium text-gray-700">
-                    Filter by tags
+                  <div className="p-1.5 bg-primary-100 rounded-lg group-hover:bg-primary-200 transition-colors">
+                    <TagIcon size={16} className="text-primary-600" />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-700">
+                    Filtrar por tags
                     {selectedTags.length > 0 && (
-                      <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
-                        {selectedTags.length} selected
+                      <span className="ml-2 px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs font-bold">
+                        {selectedTags.length} selecionada{selectedTags.length > 1 ? 's' : ''}
                       </span>
                     )}
                   </span>
                 </div>
                 {isTagsExpanded ? (
-                  <ChevronUp size={20} className="text-gray-600" />
+                  <ChevronUp size={20} className="text-gray-600 group-hover:text-primary-600 transition-colors" />
                 ) : (
-                  <ChevronDown size={20} className="text-gray-600" />
+                  <ChevronDown size={20} className="text-gray-600 group-hover:text-primary-600 transition-colors" />
                 )}
               </button>
 
               {isTagsExpanded && (
-                <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
+                <div className="px-4 py-4 bg-gradient-to-r from-gray-50 to-transparent border-t border-gray-200 animate-slide-down">
                   <div className="flex flex-wrap gap-2">
-                    {allTags.map(tag => {
+                    {allTags.map((tag, index) => {
                       const isSelected = selectedTags.includes(tag);
                       return (
                         <CategoryTag
@@ -144,6 +148,8 @@ export default function Library() {
                           outlined={!isSelected}
                           onClick={() => toggleTag(tag)}
                           icon={<TagIcon size={12} />}
+                          className="animate-fade-in"
+                          style={{ animationDelay: `${index * 20}ms` }}
                         />
                       );
                     })}
@@ -155,66 +161,81 @@ export default function Library() {
         </div>
 
         {/* Results Count */}
-        <div className="mb-4">
+        <div className="mb-6">
           <p className="text-sm text-gray-600">
-            Showing <span className="font-semibold">{filteredItems.length}</span> of {mockLibraryItems.length} resources
+            Mostrando <span className="font-bold text-gray-900">{filteredItems.length}</span> de{' '}
+            <span className="font-bold text-gray-900">{mockLibraryItems.length}</span> recursos
           </p>
         </div>
 
         {/* Library Items Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredItems.map(item => {
-            const Icon = getCategoryIcon(item.category);
-            return (
-              <div
-                key={item.id}
-                className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className={`p-1.5 rounded-lg border ${getCategoryColor(item.category)}`}>
-                    <Icon size={16} />
+        {filteredItems.length === 0 ? (
+          <div className="card p-12 text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
+              <BookOpen className="text-gray-400" size={40} />
+            </div>
+            <p className="text-gray-600 font-medium text-lg mb-2">Nenhum recurso encontrado</p>
+            <p className="text-gray-500 text-sm">Tente ajustar os filtros de busca</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredItems.map((item, index) => {
+              const Icon = getCategoryIcon(item.category);
+              return (
+                <div
+                  key={item.id}
+                  className="card p-5 hover:shadow-large transition-all duration-300 group animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`p-2.5 rounded-xl border-2 ${getCategoryColor(item.category)} group-hover:scale-110 transition-transform duration-200`}>
+                      <Icon size={20} />
+                    </div>
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 hover:bg-primary-100 rounded-xl transition-all duration-200 hover:scale-110 group/link"
+                      title="Abrir link"
+                    >
+                      <ExternalLink size={18} className="text-gray-600 group-hover/link:text-primary-600 transition-colors" />
+                    </a>
                   </div>
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Open link"
-                  >
-                    <ExternalLink size={16} className="text-gray-600" />
-                  </a>
+
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary-700 transition-colors line-clamp-2">
+                    {item.title}
+                  </h3>
+
+                  {item.description && (
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-3 leading-relaxed">
+                      {item.description}
+                    </p>
+                  )}
+
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {item.tags.map(tag => (
+                      <CategoryTag
+                        key={tag}
+                        category={tag}
+                        variant="default"
+                        size="sm"
+                        icon={<TagIcon size={10} />}
+                        className="shadow-sm"
+                      />
+                    ))}
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200 text-xs text-gray-500">
+                    <p className="font-medium text-gray-700 mb-1">Adicionado por <span className="text-primary-600">{item.addedBy}</span></p>
+                    <p>{new Date(item.addedAt).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                    })}</p>
+                  </div>
                 </div>
-
-                <h3 className="text-base font-semibold text-gray-900 mb-1.5">{item.title}</h3>
-
-                {item.description && (
-                  <p className="text-xs text-gray-600 mb-3 line-clamp-2">{item.description}</p>
-                )}
-
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {item.tags.map(tag => (
-                    <CategoryTag
-                      key={tag}
-                      category={tag}
-                      variant="default"
-                      size="sm"
-                      icon={<TagIcon size={10} />}
-                    />
-                  ))}
-                </div>
-
-                <div className="pt-3 border-t border-gray-200 text-xs text-gray-500">
-                  <p>Added by {item.addedBy}</p>
-                  <p>{new Date(item.addedAt).toLocaleDateString()}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {filteredItems.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No resources found matching your filters.</p>
+              );
+            })}
           </div>
         )}
       </main>

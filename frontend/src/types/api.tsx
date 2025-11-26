@@ -29,9 +29,6 @@ export interface SuccessResponse {
 
 export interface CourseFilters {
   search?: string;
-  responsible?: string;
-  trainingType?: string;
-  period?: string;
   page?: number;
   limit?: number;
 }
@@ -41,17 +38,12 @@ export type CoursesResponse = PaginatedResponse<Course>;
 export interface CreateCourseDto {
   name: string;
   description: string;
-  responsible: string;
-  trainingType: string;
-  deliveryDate: string;
-  duration: string;
-  modules: number;
-  projectNotes: string;
+  syllabus: string;
+  workload: number;
+  expirationDate: string;
 }
 
-export interface UpdateCourseDto extends Partial<CreateCourseDto> {
-  completion?: number;
-}
+export interface UpdateCourseDto extends Partial<CreateCourseDto> {}
 
 export interface CourseStats {
   total: number;
@@ -73,8 +65,9 @@ export interface LoginResponse {
     id: string;
     name: string;
     email: string;
-    role: 'Admin' | 'Produtor';
+    role: 'admin' | 'instructor' | 'student';
     avatar?: string;
+    createdAt?: string | Date;
   };
 }
 

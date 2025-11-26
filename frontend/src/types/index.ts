@@ -1,4 +1,31 @@
-export type TrainingType = 'Frontend' | 'Backend' | 'Fullstack' | 'DevOps' | 'Mobile' | 'Data Science';
+// Export all types from a single entry point
+export * from './user';
+export * from './pedagogical-project';
+export * from './team-management';
+export * from './content-production';
+
+// Legacy types for backward compatibility
+export interface Course {
+  id: string;
+  name: string;
+  description: string;
+  syllabus: string; // Ementa
+  workload: number; // Carga horária em horas
+  expirationDate: Date | string; // Data de expiração
+  completion: number; // 0-100 (calculado baseado nos checkboxes)
+  checklist?: ChecklistItem[];
+  createdAt: Date | string;
+  expanded?: boolean;
+}
+
+export enum TrainingType {
+  FRONTEND = 'Frontend',
+  BACKEND = 'Backend',
+  FULLSTACK = 'Fullstack',
+  DEVOPS = 'DevOps',
+  MOBILE = 'Mobile',
+  DATA_SCIENCE = 'Data Science',
+}
 
 export interface ChecklistItem {
   id: string;
@@ -10,54 +37,48 @@ export interface UsefulLink {
   id: string;
   title: string;
   url: string;
-  addedAt: Date;
+  description?: string;
+  addedAt?: Date | string;
 }
 
 export interface Comment {
   id: string;
-  author: string;
+  user: string;
   content: string;
-  createdAt: Date;
+  timestamp: Date | string;
+  author?: string;
+  createdAt?: Date | string;
 }
 
 export interface ActionHistory {
   id: string;
   action: string;
   user: string;
-  timestamp: Date;
   details?: string;
+  timestamp: Date | string;
 }
 
-export interface Course {
-  id: string;
-  name: string;
-  description: string;
-  responsible: string;
-  trainingType: TrainingType;
-  completion: number;
-  deliveryDate: Date;
-  duration: string;
-  modules: number;
-  projectNotes: string;
-  checklist: ChecklistItem[];
-  expanded?: boolean;
-  usefulLinks?: UsefulLink[];
-  comments?: Comment[];
-  actionHistory?: ActionHistory[];
-}
-
-export type FilterPeriod = 'Week' | 'Month' | 'Quarter' | 'Year';
-export type FilterFeedback = 'All' | 'Pending' | 'Completed';
-
-export type LibraryCategory = 'Documentation' | 'Tool' | 'Template' | 'Resource' | 'Guide' | 'Article';
+export type FilterPeriod = 'all' | 'week' | 'month' | 'quarter';
 
 export interface LibraryItem {
   id: string;
   title: string;
-  url: string;
+  description: string;
   category: LibraryCategory;
   tags: string[];
-  description?: string;
-  addedAt: Date;
-  addedBy: string;
+  url?: string;
+  author?: string;
+  createdAt: Date | string;
+  updatedAt?: Date | string;
+  addedBy?: string;
+  addedAt?: Date | string;
+}
+
+export enum LibraryCategory {
+  DOCUMENTATION = 'Documentation',
+  TOOL = 'Tool',
+  TEMPLATE = 'Template',
+  RESOURCE = 'Resource',
+  GUIDE = 'Guide',
+  ARTICLE = 'Article',
 }

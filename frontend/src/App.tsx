@@ -12,6 +12,14 @@ import Library from './pages/Library';
 import UserManagement from './pages/UserManagement';
 import { initializeUserStore } from './store/useUserStore';
 
+// Páginas AKCIT - Nova Arquitetura
+import MicrocourseList from './pages/PedagogicalProject/MicrocourseList';
+import LearningTrails from './pages/PedagogicalProject/LearningTrails';
+import ThematicAreas from './pages/PedagogicalProject/ThematicAreas';
+import Teams from './pages/TeamManagement/Teams';
+import Tasks from './pages/TeamManagement/Tasks';
+import Ebooks from './pages/ContentProduction/Ebooks';
+
 function App() {
   useEffect(() => {
     initializeUserStore();
@@ -34,13 +42,41 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<LayoutPrivado />}>
             <Route path="/dashboard" element={<Dashboard />} />
+
+            {/* Rotas Legacy */}
             <Route path="/courses" element={<Courses />} />
             <Route path="/library" element={<Library />} />
-            <Route path="/team" element={<div className="p-8"><h1 className="text-2xl font-bold">Team</h1></div>} />
+
+            {/* AKCIT - Projeto Pedagógico */}
+            <Route path="/microcourses" element={<MicrocourseList />} />
+            <Route path="/learning-trails" element={<LearningTrails />} />
+            <Route path="/thematic-areas" element={<ThematicAreas />} />
+
+            {/* AKCIT - Gestão de Equipes */}
+            <Route path="/teams" element={<Teams />} />
+            <Route path="/tasks" element={<Tasks />} />
+
+            {/* AKCIT - Produção de Conteúdo */}
+            <Route path="/ebooks" element={<Ebooks />} />
+            <Route path="/videos" element={<div className="p-8"><h1 className="text-2xl font-bold">Videoaulas</h1></div>} />
+            <Route path="/materials" element={<div className="p-8"><h1 className="text-2xl font-bold">Materiais Didáticos</h1></div>} />
+
+            {/* AKCIT - AVA */}
+            <Route path="/classes" element={<div className="p-8"><h1 className="text-2xl font-bold">Turmas</h1></div>} />
+            <Route path="/forums" element={<div className="p-8"><h1 className="text-2xl font-bold">Fóruns</h1></div>} />
+
+            {/* AKCIT - Estudantes */}
+            <Route path="/students" element={<div className="p-8"><h1 className="text-2xl font-bold">Alunos</h1></div>} />
+            <Route path="/interventions" element={<div className="p-8"><h1 className="text-2xl font-bold">Intervenções</h1></div>} />
+
+            {/* AKCIT - Eventos e Certificados */}
+            <Route path="/events" element={<div className="p-8"><h1 className="text-2xl font-bold">Eventos</h1></div>} />
+            <Route path="/certificates" element={<div className="p-8"><h1 className="text-2xl font-bold">Certificados</h1></div>} />
+
             <Route path="/analytics" element={<div className="p-8"><h1 className="text-2xl font-bold">Analytics</h1></div>} />
 
             {/* Rotas protegidas por role - Apenas Admin */}
-            <Route element={<RoleGuard allowedRoles={['Admin']} />}>
+            <Route element={<RoleGuard allowedRoles={['admin']} />}>
               <Route path="/user-management" element={<UserManagement />} />
             </Route>
           </Route>

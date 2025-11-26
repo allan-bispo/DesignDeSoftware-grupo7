@@ -4,7 +4,11 @@ import { useUserStore } from '../store/useUserStore';
 import UserAuthModal from './UserAuthModal';
 import Avatar from './Avatar';
 
-export default function Header() {
+interface HeaderProps {
+  onNewCourse?: () => void;
+}
+
+export default function Header({ onNewCourse }: HeaderProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -24,29 +28,36 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-white border-b border-gray-200 px-8 py-4">
+      <header className="bg-white border-b border-gray-200 px-8 py-5 shadow-soft sticky top-0 z-30 backdrop-blur-sm bg-white/95">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Course Production Dashboard</h1>
-            <p className="text-sm text-gray-500 mt-1">Manage and track your course production pipeline</p>
+            <h1 className="text-2xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Painel de Produção de Cursos
+            </h1>
+            <p className="text-sm text-gray-500 mt-1.5">Gerencie e acompanhe sua linha de produção de cursos</p>
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium">
-              <Plus size={20} />
-              New Course
-            </button>
+            {onNewCourse && (
+              <button
+                onClick={onNewCourse}
+                className="btn-primary flex items-center gap-2 group"
+              >
+                <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                <span>Novo Curso</span>
+              </button>
+            )}
 
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
-              <Bell size={20} className="text-gray-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            <button className="relative p-2.5 hover:bg-gray-100 rounded-xl transition-all duration-200 group">
+              <Bell size={20} className="text-gray-600 group-hover:text-primary-600 transition-colors" />
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
             </button>
 
             {/* Menu de Usuário */}
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="hover:opacity-80 transition-opacity"
+                className="hover:opacity-80 transition-all duration-200 hover:ring-2 hover:ring-primary-200 rounded-full"
                 title={isAuthenticated && user ? `${user.name}` : 'Fazer login'}
               >
                 <Avatar
@@ -58,21 +69,21 @@ export default function Header() {
 
               {/* Dropdown Menu */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                <div className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-large border border-gray-200 z-50 animate-scale-in overflow-hidden">
                   {isAuthenticated && user ? (
                     <>
                       {/* Informações do Usuário */}
-                      <div className="p-4 border-b border-gray-200">
+                      <div className="p-5 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100/50">
                         <div className="flex items-center gap-3">
                           <Avatar
                             src={user.avatar}
                             name={user.name}
                             size="md"
                           />
-                          <div>
-                            <p className="font-semibold text-gray-900">{user.name}</p>
-                            <p className="text-sm text-gray-600">{user.email}</p>
-                            <p className="text-xs text-primary-600 font-medium mt-1 uppercase">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-gray-900 truncate">{user.name}</p>
+                            <p className="text-sm text-gray-600 truncate">{user.email}</p>
+                            <p className="text-xs text-primary-700 font-semibold mt-1.5 uppercase tracking-wide">
                               {user.role}
                             </p>
                           </div>
@@ -80,31 +91,31 @@ export default function Header() {
                       </div>
 
                       {/* Menu Items */}
-                      <div className="p-2 space-y-1">
+                      <div className="p-2">
                         <button
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                          className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200 group"
                         >
-                          <Settings size={16} />
-                          <span>Configurações</span>
+                          <Settings size={18} className="text-gray-400 group-hover:text-primary-600 transition-colors" />
+                          <span className="font-medium">Configurações</span>
                         </button>
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                          className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group mt-1"
                         >
-                          <LogOut size={16} />
-                          <span>Fazer Logout</span>
+                          <LogOut size={18} className="group-hover:rotate-12 transition-transform" />
+                          <span className="font-medium">Fazer Logout</span>
                         </button>
                       </div>
                     </>
                   ) : (
                     <>
                       {/* Quando não autenticado */}
-                      <div className="p-4 text-center">
-                        <p className="text-gray-700 font-medium mb-3">Faça login para continuar</p>
+                      <div className="p-5 text-center">
+                        <p className="text-gray-700 font-medium mb-4">Faça login para continuar</p>
                         <button
                           onClick={handleOpenAuth}
-                          className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+                          className="btn-primary w-full"
                         >
                           Fazer Login
                         </button>
