@@ -182,6 +182,8 @@ interface CategoryTagProps {
   onRemove?: () => void;
   onClick?: () => void;
   icon?: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 export const CategoryTag = ({
@@ -193,6 +195,7 @@ export const CategoryTag = ({
   onRemove,
   onClick,
   icon,
+  className,
 }: CategoryTagProps) => {
   return (
     <Tag
@@ -203,6 +206,7 @@ export const CategoryTag = ({
       onRemove={onRemove}
       onClick={onClick}
       icon={icon}
+      className={className}
     >
       {category}
     </Tag>

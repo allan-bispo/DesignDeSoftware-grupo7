@@ -89,12 +89,14 @@ export default function CourseCard({ course, onToggleExpand, onOpenDetails, onTo
             </div>
           </div>
 
-          <div className="p-2">
-            <p className="text-xs text-gray-500 font-medium mb-1.5">Tipo de Treinamento</p>
-            <Tag variant={getTrainingTypeVariant(course.trainingType)} size="sm" className="shadow-sm">
-              {course.trainingType}
-            </Tag>
-          </div>
+          {course.trainingType && (
+            <div className="p-2">
+              <p className="text-xs text-gray-500 font-medium mb-1.5">Tipo de Treinamento</p>
+              <Tag variant={getTrainingTypeVariant(course.trainingType)} size="sm" className="shadow-sm">
+                {course.trainingType}
+              </Tag>
+            </div>
+          )}
         </div>
 
         <div className="mt-5 ml-11">
@@ -110,11 +112,13 @@ export default function CourseCard({ course, onToggleExpand, onOpenDetails, onTo
           </div>
         </div>
 
-        <div className="mt-5 ml-11 flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-transparent rounded-lg">
-          <p className="text-sm text-gray-600">
-            Data de Entrega: <span className="font-bold text-gray-900">{format(course.deliveryDate, 'dd/MM/yyyy')}</span>
-          </p>
-        </div>
+        {course.deliveryDate && (
+          <div className="mt-5 ml-11 flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-transparent rounded-lg">
+            <p className="text-sm text-gray-600">
+              Data de Entrega: <span className="font-bold text-gray-900">{format(new Date(course.deliveryDate), 'dd/MM/yyyy')}</span>
+            </p>
+          </div>
+        )}
 
         {course.expanded && (
           <div className="mt-6 ml-11 pt-6 border-t border-gray-200 animate-slide-down">
@@ -123,7 +127,7 @@ export default function CourseCard({ course, onToggleExpand, onOpenDetails, onTo
               Checklist de Produção
             </h4>
             <div className="grid grid-cols-2 gap-3">
-              {course.checklist.map((item) => (
+              {course.checklist?.map((item) => (
                 <label key={item.id} className="flex items-center gap-3 cursor-pointer group/item p-2 rounded-lg hover:bg-gray-50 transition-colors">
                   <input
                     type="checkbox"
@@ -136,8 +140,8 @@ export default function CourseCard({ course, onToggleExpand, onOpenDetails, onTo
                     className="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 cursor-pointer transition-all"
                   />
                   <span className={`text-sm font-medium transition-all ${
-                    item.completed 
-                      ? 'text-gray-400 line-through' 
+                    item.completed
+                      ? 'text-gray-400 line-through'
                       : 'text-gray-700 group-hover/item:text-gray-900'
                   }`}>
                     {item.label}
@@ -146,13 +150,15 @@ export default function CourseCard({ course, onToggleExpand, onOpenDetails, onTo
               ))}
             </div>
 
-            <div className="mt-5 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl shadow-soft">
-              <h5 className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
-                <div className="w-1.5 h-4 bg-amber-500 rounded-full"></div>
-                Notas do Projeto
-              </h5>
-              <p className="text-sm text-amber-800 leading-relaxed">{course.projectNotes}</p>
-            </div>
+            {course.projectNotes && (
+              <div className="mt-5 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl shadow-soft">
+                <h5 className="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
+                  <div className="w-1.5 h-4 bg-amber-500 rounded-full"></div>
+                  Notas do Projeto
+                </h5>
+                <p className="text-sm text-amber-800 leading-relaxed">{course.projectNotes}</p>
+              </div>
+            )}
           </div>
         )}
       </div>

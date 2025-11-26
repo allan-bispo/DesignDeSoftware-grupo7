@@ -9,13 +9,23 @@ export interface Course {
   id: string;
   name: string;
   description: string;
-  syllabus: string; // Ementa
-  workload: number; // Carga horária em horas
-  expirationDate: Date | string; // Data de expiração
+  syllabus?: string; // Ementa
+  workload?: number; // Carga horária em horas
+  expirationDate?: Date | string; // Data de expiração
   completion: number; // 0-100 (calculado baseado nos checkboxes)
   checklist?: ChecklistItem[];
-  createdAt: Date | string;
+  createdAt?: Date | string;
   expanded?: boolean;
+  // Additional properties
+  responsible?: string;
+  duration?: string;
+  modules?: number;
+  trainingType?: string;
+  deliveryDate?: Date | string;
+  projectNotes?: string;
+  usefulLinks?: UsefulLink[];
+  comments?: Comment[];
+  actionHistory?: ActionHistory[];
 }
 
 export enum TrainingType {

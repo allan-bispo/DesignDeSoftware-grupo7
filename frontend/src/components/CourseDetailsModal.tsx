@@ -74,9 +74,9 @@ export default function CourseDetailsModal({ course, isOpen, onClose, onUpdateCo
 
     const comment: Comment = {
       id: `comment-${Date.now()}`,
-      author: 'Você',
+      user: 'Você',
       content: newComment,
-      createdAt: new Date(),
+      timestamp: new Date(),
     };
 
     const updatedCourse = {
@@ -110,8 +110,8 @@ export default function CourseDetailsModal({ course, isOpen, onClose, onUpdateCo
     return variants[type] || 'default';
   };
 
-  const completedTasks = course.checklist.filter(item => item.completed).length;
-  const totalTasks = course.checklist.length;
+  const completedTasks = course.checklist?.filter(item => item.completed).length || 0;
+  const totalTasks = course.checklist?.length || 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
@@ -121,9 +121,11 @@ export default function CourseDetailsModal({ course, isOpen, onClose, onUpdateCo
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <h2 className="text-2xl font-semibold text-gray-900">{course.name}</h2>
-              <Tag variant={getTrainingTypeVariant(course.trainingType)} size="sm">
-                {course.trainingType}
-              </Tag>
+              {course.trainingType && (
+                <Tag variant={getTrainingTypeVariant(course.trainingType)} size="sm">
+                  {course.trainingType}
+                </Tag>
+              )}
             </div>
             <p className="text-gray-600">{course.description}</p>
           </div>
@@ -201,38 +203,46 @@ export default function CourseDetailsModal({ course, isOpen, onClose, onUpdateCo
               {/* Course Info Grid */}
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
-                      <User size={16} />
-                      Responsável
-                    </label>
-                    <p className="text-gray-900 font-medium">{course.responsible}</p>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
-                      <Clock size={16} />
-                      Duração
-                    </label>
-                    <p className="text-gray-900 font-medium">{course.duration}</p>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 mb-1 block">
-                      Módulos
-                    </label>
-                    <p className="text-gray-900 font-medium">{course.modules} módulos</p>
-                  </div>
+                  {course.responsible && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
+                        <User size={16} />
+                        Responsável
+                      </label>
+                      <p className="text-gray-900 font-medium">{course.responsible}</p>
+                    </div>
+                  )}
+
+                  {course.duration && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
+                        <Clock size={16} />
+                        Duração
+                      </label>
+                      <p className="text-gray-900 font-medium">{course.duration}</p>
+                    </div>
+                  )}
+
+                  {course.modules && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 mb-1 block">
+                        Módulos
+                      </label>
+                      <p className="text-gray-900 font-medium">{course.modules} módulos</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
-                      <Calendar size={16} />
-                      Data de Entrega
-                    </label>
-                    <p className="text-gray-900 font-medium">{format(course.deliveryDate, 'dd/MM/yyyy')}</p>
-                  </div>
+                  {course.deliveryDate && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 flex items-center gap-2 mb-1">
+                        <Calendar size={16} />
+                        Data de Entrega
+                      </label>
+                      <p className="text-gray-900 font-medium">{format(new Date(course.deliveryDate), 'dd/MM/yyyy')}</p>
+                    </div>
+                  )}
                   
                   <div>
                     <label className="text-sm font-medium text-gray-500 mb-1 block">
@@ -261,30 +271,34 @@ export default function CourseDetailsModal({ course, isOpen, onClose, onUpdateCo
               </div>
 
               {/* Project Notes */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-amber-900 mb-2">Notas do Projeto</h3>
-                <p className="text-sm text-amber-800">{course.projectNotes}</p>
-              </div>
+              {course.projectNotes && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-amber-900 mb-2">Notas do Projeto</h3>
+                  <p className="text-sm text-amber-800">{course.projectNotes}</p>
+                </div>
+              )}
 
               {/* Checklist */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Checklist de Produção</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {course.checklist.map((item) => (
-                    <label key={item.id} className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={item.completed}
-                        readOnly
-                        className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                      />
-                      <span className={`text-sm ${item.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>
-                        {item.label}
-                      </span>
-                    </label>
-                  ))}
+              {course.checklist && course.checklist.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Checklist de Produção</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {course.checklist.map((item) => (
+                      <label key={item.id} className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={item.completed}
+                          readOnly
+                          className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                        />
+                        <span className={`text-sm ${item.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>
+                          {item.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
@@ -389,12 +403,12 @@ export default function CourseDetailsModal({ course, isOpen, onClose, onUpdateCo
                       className="p-4 bg-white border border-gray-200 rounded-lg"
                     >
                       <div className="flex items-start gap-3 mb-2">
-                        <Avatar name={comment.author} size="sm" />
+                        <Avatar name={comment.author || comment.user} size="sm" />
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium text-gray-900">{comment.author}</span>
+                            <span className="font-medium text-gray-900">{comment.author || comment.user}</span>
                             <span className="text-xs text-gray-500">
-                              {format(comment.createdAt, 'dd/MM/yyyy HH:mm')}
+                              {format(comment.createdAt || comment.timestamp, 'dd/MM/yyyy HH:mm')}
                             </span>
                           </div>
                           <p className="text-gray-700 text-sm">{comment.content}</p>

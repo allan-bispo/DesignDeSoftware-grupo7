@@ -59,7 +59,15 @@ export default function Library() {
     return matchesSearch && matchesCategory && matchesTags;
   });
 
-  const categories: Array<LibraryCategory | 'All'> = ['All', 'Documentation', 'Tool', 'Template', 'Resource', 'Guide', 'Article'];
+  const categories: Array<LibraryCategory | 'All'> = [
+    'All',
+    LibraryCategory.DOCUMENTATION,
+    LibraryCategory.TOOL,
+    LibraryCategory.TEMPLATE,
+    LibraryCategory.RESOURCE,
+    LibraryCategory.GUIDE,
+    LibraryCategory.ARTICLE,
+  ];
 
   return (
     <div className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
@@ -227,11 +235,13 @@ export default function Library() {
 
                   <div className="pt-4 border-t border-gray-200 text-xs text-gray-500">
                     <p className="font-medium text-gray-700 mb-1">Adicionado por <span className="text-primary-600">{item.addedBy}</span></p>
-                    <p>{new Date(item.addedAt).toLocaleDateString('pt-BR', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                    })}</p>
+                    {item.addedAt && (
+                      <p>{new Date(item.addedAt).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })}</p>
+                    )}
                   </div>
                 </div>
               );
