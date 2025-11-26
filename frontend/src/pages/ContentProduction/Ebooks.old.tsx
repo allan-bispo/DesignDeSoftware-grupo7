@@ -14,173 +14,19 @@ const statusColors: Record<EbookStatus, string> = {
 };
 
 export default function Ebooks() {
-  // Dados mockados de ebooks
-  const [ebooks] = useState<Ebook[]>([
-    {
-      id: '1',
-      title: 'Introdução ao React: Fundamentos e Práticas',
-      description: 'Guia completo sobre os fundamentos do React, incluindo componentes, hooks e gerenciamento de estado.',
-      status: EbookStatus.PUBLISHED,
-      microcourse: {
-        id: 'm1',
-        name: 'Desenvolvimento Web com React',
-        description: 'Curso completo de React',
-        syllabus: 'React básico a avançado',
-        workload: 40,
-        pedagogicalApproach: PedagogicalApproach.SELF_INSTRUCTIONAL,
-        status: MicrocourseStatus.PUBLISHED,
-        createdAt: '2025-01-01T00:00:00Z',
-        updatedAt: '2025-01-01T00:00:00Z',
-      },
-      author: {
-        id: 'u1',
-        name: 'Prof. Ana Paula Costa',
-        email: 'ana.costa@example.com',
-        role: 'instructor',
-        createdAt: '2024-01-01T00:00:00Z',
-      },
-      illustrator: {
-        id: 'u2',
-        name: 'Carlos Mendes',
-        email: 'carlos.mendes@example.com',
-        role: 'instructor',
-        createdAt: '2024-01-01T00:00:00Z',
-      },
-      version: 2,
-      publishedAt: '2025-01-20T10:00:00Z',
-      createdAt: '2025-01-05T08:00:00Z',
-      updatedAt: '2025-01-20T10:00:00Z',
-    },
-    {
-      id: '2',
-      title: 'Python para Data Science: Análise de Dados',
-      description: 'Aprenda análise de dados com Python, pandas, numpy e visualização com matplotlib.',
-      status: EbookStatus.LAYOUT_PDF,
-      microcourse: {
-        id: 'm2',
-        name: 'Python para Data Science',
-        description: 'Curso de análise de dados',
-        syllabus: 'Python, pandas, numpy',
-        workload: 60,
-        pedagogicalApproach: PedagogicalApproach.TUTOR_SUPPORTED,
-        status: MicrocourseStatus.APPROVED,
-        createdAt: '2025-01-01T00:00:00Z',
-        updatedAt: '2025-01-01T00:00:00Z',
-      },
-      author: {
-        id: 'u3',
-        name: 'Dr. Roberto Silva',
-        email: 'roberto.silva@example.com',
-        role: 'instructor',
-        createdAt: '2024-01-01T00:00:00Z',
-      },
-      version: 1,
-      createdAt: '2025-01-10T09:00:00Z',
-      updatedAt: '2025-01-25T11:00:00Z',
-    },
-    {
-      id: '3',
-      title: 'DevOps Essencial: Docker e Kubernetes',
-      description: 'Guia prático sobre containers, orquestração e práticas DevOps modernas.',
-      status: EbookStatus.EDITORIAL_REVIEW,
-      microcourse: {
-        id: 'm3',
-        name: 'DevOps Essencial',
-        description: 'Práticas DevOps',
-        syllabus: 'Docker, Kubernetes, CI/CD',
-        workload: 50,
-        pedagogicalApproach: PedagogicalApproach.ADVISOR_SUPPORTED,
-        status: MicrocourseStatus.IN_INTERNAL_VALIDATION,
-        createdAt: '2025-01-01T00:00:00Z',
-        updatedAt: '2025-01-01T00:00:00Z',
-      },
-      author: {
-        id: 'u4',
-        name: 'Eng. Fernanda Oliveira',
-        email: 'fernanda.oliveira@example.com',
-        role: 'instructor',
-        createdAt: '2024-01-01T00:00:00Z',
-      },
-      reviewer: {
-        id: 'u5',
-        name: 'Prof. Paulo Santos',
-        email: 'paulo.santos@example.com',
-        role: 'instructor',
-        createdAt: '2024-01-01T00:00:00Z',
-      },
-      version: 1,
-      createdAt: '2025-01-12T10:00:00Z',
-      updatedAt: '2025-01-24T15:00:00Z',
-    },
-    {
-      id: '4',
-      title: 'Banco de Dados SQL: Do Básico ao Avançado',
-      description: 'Aprenda SQL desde fundamentos até consultas complexas e otimização.',
-      status: EbookStatus.ILLUSTRATION,
-      microcourse: {
-        id: 'm4',
-        name: 'Banco de Dados Relacionais',
-        description: 'SQL e modelagem',
-        syllabus: 'SQL, modelagem ER',
-        workload: 45,
-        pedagogicalApproach: PedagogicalApproach.SELF_INSTRUCTIONAL,
-        status: MicrocourseStatus.APPROVED,
-        createdAt: '2025-01-01T00:00:00Z',
-        updatedAt: '2025-01-01T00:00:00Z',
-      },
-      author: {
-        id: 'u6',
-        name: 'Maria Eduarda Santos',
-        email: 'maria.santos@example.com',
-        role: 'instructor',
-        createdAt: '2024-01-01T00:00:00Z',
-      },
-      illustrator: {
-        id: 'u2',
-        name: 'Carlos Mendes',
-        email: 'carlos.mendes@example.com',
-        role: 'instructor',
-        createdAt: '2024-01-01T00:00:00Z',
-      },
-      version: 1,
-      createdAt: '2025-01-15T11:00:00Z',
-      updatedAt: '2025-01-26T14:00:00Z',
-    },
-    {
-      id: '5',
-      title: 'JavaScript Moderno: ES6+ e Além',
-      description: 'Explore recursos modernos do JavaScript e suas aplicações práticas.',
-      status: EbookStatus.WRITING,
-      microcourse: {
-        id: 'm5',
-        name: 'JavaScript Avançado',
-        description: 'JavaScript moderno',
-        syllabus: 'ES6+, async/await',
-        workload: 35,
-        pedagogicalApproach: PedagogicalApproach.TUTOR_SUPPORTED,
-        status: MicrocourseStatus.DRAFT,
-        createdAt: '2025-01-01T00:00:00Z',
-        updatedAt: '2025-01-01T00:00:00Z',
-      },
-      author: {
-        id: 'u7',
-        name: 'Juliana Costa',
-        email: 'juliana.costa@example.com',
-        role: 'instructor',
-        createdAt: '2024-01-01T00:00:00Z',
-      },
-      version: 1,
-      createdAt: '2025-01-18T09:00:00Z',
-      updatedAt: '2025-01-27T16:00:00Z',
-    },
-  ]);
+  const [searchTerm] = useState('');
+
+  const { data: ebooks, isLoading } = useQuery({
+    queryKey: ['ebooks', searchTerm],
+    queryFn: () => ebookService.getAll({ search: searchTerm }),
+  });
 
   const stats = {
-    totalEbooks: ebooks.length,
-    inProgress: ebooks.filter((e) =>
+    totalEbooks: ebooks?.data?.length || 0,
+    inProgress: ebooks?.data?.filter((e: any) =>
       e.status !== EbookStatus.PUBLISHED && e.status !== EbookStatus.APPROVED
-    ).length,
-    published: ebooks.filter((e) => e.status === EbookStatus.PUBLISHED).length,
+    ).length || 0,
+    published: ebooks?.data?.filter((e: any) => e.status === EbookStatus.PUBLISHED).length || 0,
   };
 
   return (
@@ -232,7 +78,9 @@ export default function Ebooks() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm">
-        {ebooks.length === 0 ? (
+        {isLoading ? (
+          <div className="p-8 text-center">Carregando...</div>
+        ) : ebooks?.data?.length === 0 ? (
           <div className="p-12 text-center">
             <BookOpen className="mx-auto text-gray-400 mb-4" size={48} />
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
@@ -251,7 +99,7 @@ export default function Ebooks() {
           </div>
         ) : (
           <div className="divide-y">
-            {ebooks.map((ebook: Ebook) => (
+            {ebooks?.data?.map((ebook: any) => (
               <Link
                 key={ebook.id}
                 to={`/ebooks/${ebook.id}`}

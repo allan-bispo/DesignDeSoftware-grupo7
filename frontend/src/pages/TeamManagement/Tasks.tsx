@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Plus, Calendar, User, AlertCircle } from 'lucide-react';
-import { teamService } from '../../services/api/teamService';
-import { TaskStatus, TaskPriority } from '../../types';
+import { TaskAssignment, TaskStatus, TaskPriority, TaskType } from '../../types';
 
 const statusColumns = [
   { status: TaskStatus.PENDING, label: 'Pendente', color: 'bg-gray-100' },
@@ -27,15 +25,127 @@ const priorityLabels = {
 };
 
 export default function Tasks() {
-  const [selectedStatus] = useState<TaskStatus | undefined>();
-
-  const { data: tasks, isLoading } = useQuery({
-    queryKey: ['tasks', selectedStatus],
-    queryFn: () => teamService.getAllTasks({ status: selectedStatus }),
-  });
+  // Dados mockados de tarefas
+  const [tasks] = useState<TaskAssignment[]>([
+    {
+      id: '1',
+      title: 'Revisar conteúdo do Módulo 1',
+      description: 'Revisar e corrigir o conteúdo textual do primeiro módulo do curso de React.',
+      type: TaskType.REVIEW,
+      status: TaskStatus.IN_PROGRESS,
+      priority: TaskPriority.HIGH,
+      assignedTo: {
+        id: 'u1',
+        name: 'Ana Paula Costa',
+        email: 'ana.costa@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      dueDate: '2025-02-10',
+      progress: 65,
+      createdAt: '2025-01-15T10:00:00Z',
+      updatedAt: '2025-01-25T14:00:00Z',
+    },
+    {
+      id: '2',
+      title: 'Criar ilustrações para slides',
+      description: 'Desenvolver 5 ilustrações customizadas para os slides do curso de Python.',
+      type: TaskType.ILLUSTRATION,
+      status: TaskStatus.PENDING,
+      priority: TaskPriority.MEDIUM,
+      assignedTo: {
+        id: 'u2',
+        name: 'Carlos Silva',
+        email: 'carlos.silva@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      dueDate: '2025-02-15',
+      progress: 0,
+      createdAt: '2025-01-20T09:00:00Z',
+      updatedAt: '2025-01-20T09:00:00Z',
+    },
+    {
+      id: '3',
+      title: 'Gravar videoaula sobre APIs REST',
+      description: 'Produzir videoaula explicando conceitos de APIs REST e exemplos práticos.',
+      type: TaskType.VIDEO_PRODUCTION,
+      status: TaskStatus.UNDER_REVIEW,
+      priority: TaskPriority.URGENT,
+      assignedTo: {
+        id: 'u3',
+        name: 'Roberto Mendes',
+        email: 'roberto.mendes@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      dueDate: '2025-02-05',
+      progress: 100,
+      createdAt: '2025-01-10T08:00:00Z',
+      updatedAt: '2025-01-28T16:00:00Z',
+    },
+    {
+      id: '4',
+      title: 'Criar quiz de avaliação final',
+      description: 'Elaborar questionário de 20 questões para avaliação do módulo de DevOps.',
+      type: TaskType.QUIZ_CREATION,
+      status: TaskStatus.COMPLETED,
+      priority: TaskPriority.MEDIUM,
+      assignedTo: {
+        id: 'u4',
+        name: 'Fernanda Oliveira',
+        email: 'fernanda.oliveira@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      dueDate: '2025-01-30',
+      completedAt: '2025-01-28T10:00:00Z',
+      progress: 100,
+      createdAt: '2025-01-08T11:00:00Z',
+      updatedAt: '2025-01-28T10:00:00Z',
+    },
+    {
+      id: '5',
+      title: 'Escrever conteúdo sobre Machine Learning',
+      description: 'Redigir apostila completa sobre algoritmos de Machine Learning.',
+      type: TaskType.CONTENT_WRITING,
+      status: TaskStatus.IN_PROGRESS,
+      priority: TaskPriority.HIGH,
+      assignedTo: {
+        id: 'u5',
+        name: 'Dr. Paulo Santos',
+        email: 'paulo.santos@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      dueDate: '2025-02-20',
+      progress: 40,
+      createdAt: '2025-01-12T09:00:00Z',
+      updatedAt: '2025-01-26T15:00:00Z',
+    },
+    {
+      id: '6',
+      title: 'Moderar fórum da semana 3',
+      description: 'Responder dúvidas e moderar discussões no fórum do curso de JavaScript.',
+      type: TaskType.FORUM_MODERATION,
+      status: TaskStatus.PENDING,
+      priority: TaskPriority.LOW,
+      assignedTo: {
+        id: 'u6',
+        name: 'Juliana Costa',
+        email: 'juliana.costa@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      dueDate: '2025-02-08',
+      progress: 0,
+      createdAt: '2025-01-18T10:00:00Z',
+      updatedAt: '2025-01-18T10:00:00Z',
+    },
+  ]);
 
   const getTasksByStatus = (status: TaskStatus) => {
-    return (tasks as any)?.data?.filter((task: any) => task.status === status) || [];
+    return tasks.filter((task) => task.status === status);
   };
 
   return (
@@ -51,28 +161,23 @@ export default function Tasks() {
         </button>
       </div>
 
-      {isLoading ? (
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-          Carregando...
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {statusColumns.map((column) => {
-            const columnTasks = getTasksByStatus(column.status);
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        {statusColumns.map((column) => {
+          const columnTasks = getTasksByStatus(column.status);
 
-            return (
-              <div key={column.status} className="flex flex-col">
-                <div className={`${column.color} rounded-t-lg p-3`}>
-                  <h3 className="font-semibold text-sm">
-                    {column.label}
-                    <span className="ml-2 text-xs opacity-75">
-                      ({columnTasks.length})
-                    </span>
-                  </h3>
-                </div>
+          return (
+            <div key={column.status} className="flex flex-col">
+              <div className={`${column.color} rounded-t-lg p-3`}>
+                <h3 className="font-semibold text-sm">
+                  {column.label}
+                  <span className="ml-2 text-xs opacity-75">
+                    ({columnTasks.length})
+                  </span>
+                </h3>
+              </div>
 
-                <div className="bg-gray-50 rounded-b-lg p-2 min-h-[500px] space-y-2">
-                  {columnTasks.map((task: any) => (
+              <div className="bg-gray-50 rounded-b-lg p-2 min-h-[500px] space-y-2">
+                {columnTasks.map((task: TaskAssignment) => (
                     <div
                       key={task.id}
                       className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
@@ -133,33 +238,16 @@ export default function Tasks() {
                     </div>
                   ))}
 
-                  {columnTasks.length === 0 && (
-                    <div className="text-center py-8 text-gray-400 text-sm">
-                      Nenhuma tarefa
-                    </div>
-                  )}
-                </div>
+                {columnTasks.length === 0 && (
+                  <div className="text-center py-8 text-gray-400 text-sm">
+                    Nenhuma tarefa
+                  </div>
+                )}
               </div>
-            );
-          })}
-        </div>
-      )}
-
-      {!isLoading && (!(tasks as any)?.data || (tasks as any).data.length === 0) && (
-        <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-          <AlertCircle className="mx-auto text-gray-400 mb-4" size={48} />
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">
-            Nenhuma tarefa cadastrada
-          </h3>
-          <p className="text-gray-500 mb-4">
-            Comece criando sua primeira tarefa
-          </p>
-          <button className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-            <Plus size={20} />
-            Criar Tarefa
-          </button>
-        </div>
-      )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

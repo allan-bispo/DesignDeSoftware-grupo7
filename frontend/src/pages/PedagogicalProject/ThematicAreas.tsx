@@ -1,21 +1,85 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Plus, BookOpen, Users, Layers } from 'lucide-react';
-import { thematicAreaService } from '../../services/api/thematicAreaService';
+import { ThematicArea } from '../../types';
 
 export default function ThematicAreas() {
-  const [searchTerm] = useState('');
-
-  const { data: areas, isLoading } = useQuery({
-    queryKey: ['thematic-areas', searchTerm],
-    queryFn: () => thematicAreaService.getAll({ search: searchTerm }),
-  });
+  // Dados mockados de áreas temáticas
+  const [areas] = useState<ThematicArea[]>([
+    {
+      id: '1',
+      name: 'Inteligência Artificial e Machine Learning',
+      description: 'Área focada em algoritmos de aprendizado de máquina, redes neurais, processamento de linguagem natural e visão computacional.',
+      isActive: true,
+      coordinator: {
+        id: 'c1',
+        name: 'Dr. Roberto Silva',
+        email: 'roberto.silva@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      createdAt: '2025-01-05T10:00:00Z',
+      updatedAt: '2025-01-15T14:00:00Z',
+    },
+    {
+      id: '2',
+      name: 'Desenvolvimento Web Moderno',
+      description: 'Tecnologias e frameworks para desenvolvimento web, incluindo React, Vue, Angular, Node.js e práticas de UX/UI.',
+      isActive: true,
+      coordinator: {
+        id: 'c2',
+        name: 'Profª Ana Paula Costa',
+        email: 'ana.costa@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      createdAt: '2025-01-08T09:00:00Z',
+      updatedAt: '2025-01-18T11:00:00Z',
+    },
+    {
+      id: '3',
+      name: 'DevOps e Infraestrutura Cloud',
+      description: 'Práticas DevOps, containers, Kubernetes, CI/CD, monitoramento e serviços em cloud (AWS, Azure, GCP).',
+      isActive: true,
+      coordinator: {
+        id: 'c3',
+        name: 'Eng. Carlos Mendes',
+        email: 'carlos.mendes@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      createdAt: '2025-01-10T08:00:00Z',
+      updatedAt: '2025-01-20T16:00:00Z',
+    },
+    {
+      id: '4',
+      name: 'Segurança da Informação',
+      description: 'Cibersegurança, criptografia, testes de penetração, análise de vulnerabilidades e boas práticas de segurança.',
+      isActive: true,
+      createdAt: '2025-01-12T10:30:00Z',
+      updatedAt: '2025-01-22T13:00:00Z',
+    },
+    {
+      id: '5',
+      name: 'Análise de Dados e Big Data',
+      description: 'Processamento e análise de grandes volumes de dados, data lakes, data warehouses e visualização de dados.',
+      isActive: false,
+      coordinator: {
+        id: 'c4',
+        name: 'Dr. Fernanda Oliveira',
+        email: 'fernanda.oliveira@example.com',
+        role: 'instructor',
+        createdAt: '2024-01-01T00:00:00Z',
+      },
+      createdAt: '2025-01-15T11:00:00Z',
+      updatedAt: '2025-01-23T09:00:00Z',
+    },
+  ]);
 
   const stats = {
-    totalAreas: areas?.data?.length || 0,
-    totalMicrocourses: 0,
-    totalCoordinators: 0,
+    totalAreas: areas.length,
+    totalMicrocourses: 45,
+    totalCoordinators: 4,
   };
 
   return (
@@ -67,9 +131,7 @@ export default function ThematicAreas() {
       </div>
 
       <div className="bg-white rounded-lg shadow-sm">
-        {isLoading ? (
-          <div className="p-8 text-center">Carregando...</div>
-        ) : areas?.data?.length === 0 ? (
+        {areas.length === 0 ? (
           <div className="p-12 text-center">
             <Layers className="mx-auto text-gray-400 mb-4" size={48} />
             <h3 className="text-lg font-semibold text-gray-700 mb-2">
@@ -88,47 +150,52 @@ export default function ThematicAreas() {
           </div>
         ) : (
           <div className="divide-y">
-            {areas?.data?.map((area: any) => (
-              <Link
-                key={area.id}
-                to={`/thematic-areas/${area.id}`}
-                className="block p-6 hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold mb-2">{area.name}</h3>
-                    <p className="text-gray-600 mb-3">{area.description}</p>
+            {areas.map((area: ThematicArea) => {
+              // Mock de número de microcursos por área
+              const mockMicrocoursesCount = Math.floor(Math.random() * 15) + 3;
 
-                    <div className="flex gap-6 text-sm">
-                      <div className="flex items-center gap-2">
-                        <BookOpen size={16} className="text-gray-500" />
-                        <span className="text-gray-600">
-                          {area.microcourses?.length || 0} microcursos
-                        </span>
-                      </div>
-                      {area.coordinator && (
+              return (
+                <Link
+                  key={area.id}
+                  to={`/thematic-areas/${area.id}`}
+                  className="block p-6 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold mb-2">{area.name}</h3>
+                      <p className="text-gray-600 mb-3">{area.description}</p>
+
+                      <div className="flex gap-6 text-sm">
                         <div className="flex items-center gap-2">
-                          <Users size={16} className="text-gray-500" />
+                          <BookOpen size={16} className="text-gray-500" />
                           <span className="text-gray-600">
-                            {area.coordinator.name}
+                            {mockMicrocoursesCount} microcursos
                           </span>
                         </div>
-                      )}
+                        {area.coordinator && (
+                          <div className="flex items-center gap-2">
+                            <Users size={16} className="text-gray-500" />
+                            <span className="text-gray-600">
+                              {area.coordinator.name}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  {area.isActive ? (
-                    <span className="px-3 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full">
-                      Ativa
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">
-                      Inativa
-                    </span>
-                  )}
-                </div>
-              </Link>
-            ))}
+                    {area.isActive ? (
+                      <span className="px-3 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full">
+                        Ativa
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-full">
+                        Inativa
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

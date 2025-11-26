@@ -6,18 +6,34 @@ import { useUserStore } from '../store/useUserStore';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, isLoading, error } = useUserStore();
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    try {
-      await login(email, password);
+
+    // Simula loading
+    setIsLoading(true);
+
+    // Timeout de 1.5 segundos e redireciona para o dashboard
+    setTimeout(() => {
+      // Define usuário mockado como autenticado
+      useUserStore.setState({
+        user: {
+          id: '1',
+          name: 'Usuário Demo',
+          email: email || 'demo@akcit.com',
+          role: 'admin',
+          avatar: undefined,
+          createdAt: new Date(),
+        },
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+
       navigate('/dashboard');
-    } catch (err) {
-      // Error is handled by the store
-      console.error('Login failed:', err);
-    }
+    }, 1500);
   };
 
   return (
@@ -89,13 +105,6 @@ export default function Login() {
                 />
               </div>
             </div>
-
-            {/* Mensagem de Erro */}
-            {error && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-4 animate-scale-in">
-                <p className="text-sm text-red-800 font-medium">{error}</p>
-              </div>
-            )}
 
             {/* Botão de Login */}
             <button
