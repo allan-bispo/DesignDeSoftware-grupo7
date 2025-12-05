@@ -1,5 +1,6 @@
 import { apiClient } from '../api';
 import { Microcourse } from '../../types';
+import { PaginatedResponse, SingleResponse } from '../../types/api';
 
 export interface MicrocourseFilters {
   search?: string;
@@ -11,7 +12,7 @@ export interface MicrocourseFilters {
 }
 
 export const microcourseService = {
-  getAll: async (filters?: MicrocourseFilters) => {
+  getAll: async (filters?: MicrocourseFilters): Promise<PaginatedResponse<Microcourse>> => {
     const params = new URLSearchParams();
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
@@ -22,23 +23,23 @@ export const microcourseService = {
     }
     const queryString = params.toString();
     const endpoint = queryString ? `/microcourses?${queryString}` : '/microcourses';
-    return apiClient.get(endpoint);
+    return apiClient.get<PaginatedResponse<Microcourse>>(endpoint);
   },
 
-  getById: async (id: string) => {
-    return apiClient.get<Microcourse>(`/microcourses/${id}`);
+  getById: async (id: string): Promise<SingleResponse<Microcourse>> => {
+    return apiClient.get<SingleResponse<Microcourse>>(`/microcourses/${id}`);
   },
 
-  create: async (microcourse: Partial<Microcourse>) => {
-    return apiClient.post<Microcourse>('/microcourses', microcourse);
+  create: async (microcourse: Partial<Microcourse>): Promise<SingleResponse<Microcourse>> => {
+    return apiClient.post<SingleResponse<Microcourse>>('/microcourses', microcourse);
   },
 
-  update: async (id: string, microcourse: Partial<Microcourse>) => {
-    return apiClient.put<Microcourse>(`/microcourses/${id}`, microcourse);
+  update: async (id: string, microcourse: Partial<Microcourse>): Promise<SingleResponse<Microcourse>> => {
+    return apiClient.put<SingleResponse<Microcourse>>(`/microcourses/${id}`, microcourse);
   },
 
-  delete: async (id: string) => {
-    return apiClient.delete(`/microcourses/${id}`);
+  delete: async (id: string): Promise<void> => {
+    return apiClient.delete<void>(`/microcourses/${id}`);
   },
 
   startValidation: async (id: string, stage: string) => {

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BookOpen, Search, Eye, Edit, Plus, Calendar, X, Clock, Target, Award, Lightbulb, CheckCircle2, Link2, History, ListTodo, ExternalLink, GraduationCap } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { BookOpen, Search, Eye, Edit, Plus, Calendar, X, Clock, Target, Award, Lightbulb, CheckCircle2, Link2, History, ListTodo, ExternalLink, GraduationCap, TrendingUp, AlertCircle, BarChart3 } from 'lucide-react';
 import Header from '../components/Header';
 import { Course } from '../types';
 import CreateCourseModal from '../components/CreateCourseModal';
@@ -171,25 +171,60 @@ export default function Dashboard() {
     { id: '1', action: 'Curso criado', user: 'Sistema', timestamp: new Date(), details: 'Curso inicial criado no sistema' },
   ];
 
-  // Calcula a porcentagem de conclusão baseada nos checkboxes
+  // Calcula a porcentagem de conclusão baseada apenas nas atividades gerais
   const calculateCompletionPercentage = () => {
     const totalGeneralActivities = Object.keys(generalActivities).length;
     const completedGeneralActivities = Object.values(generalActivities).filter(Boolean).length;
-    const totalLibraryItems = mockLibraryItems.length;
-    const linkedItems = linkedLibraryItems.length;
 
-    const totalTasks = totalGeneralActivities + totalLibraryItems;
-    const completedTasks = completedGeneralActivities + linkedItems;
-
-    return totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    return totalGeneralActivities > 0 ? Math.round((completedGeneralActivities / totalGeneralActivities) * 100) : 0;
   };
 
   const completionPercentage = calculateCompletionPercentage();
 
+  // Cálculo das métricas
+  const metrics = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const total = courses.length;
+    const completed = courses.filter(c => c.completion === 100).length;
+    const inProgress = courses.filter(c => c.completion > 0 && c.completion < 100).length;
+    const delayed = courses.filter(c => {
+      const expiration = new Date(c.expirationDate);
+      expiration.setHours(0, 0, 0, 0);
+      return expiration < today && c.completion < 100;
+    }).length;
+    const notStarted = courses.filter(c => c.completion === 0).length;
+
+    const averageCompletion = total > 0
+      ? Math.round(courses.reduce((sum, c) => sum + c.completion, 0) / total)
+      : 0;
+
+    const totalWorkload = courses.reduce((sum, c) => sum + (c.workload || 0), 0);
+
+    // Distribuição por tipo de treinamento
+    const byType: { [key: string]: number } = {};
+    courses.forEach(c => {
+      const type = c.trainingType || 'Outros';
+      byType[type] = (byType[type] || 0) + 1;
+    });
+
+    return {
+      total,
+      completed,
+      inProgress,
+      delayed,
+      notStarted,
+      averageCompletion,
+      totalWorkload,
+      byType
+    };
+  }, [courses]);
+
   return (
     <div className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
       <Header />
-      
+
       <main className="p-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -204,6 +239,162 @@ export default function Dashboard() {
             <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
             <span>Novo Curso</span>
           </button>
+        </div>
+
+        {/* Cards de Métricas Principais */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total de Cursos */}
+          <div className="card p-6 hover:shadow-large transition-all duration-300 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Total de Cursos</p>
+                <p className="text-3xl font-bold text-gray-900">{metrics.total}</p>
+              </div>
+              <div className="p-3 bg-primary-100 rounded-xl">
+                <BookOpen className="text-primary-600" size={32} />
+              </div>
+            </div>
+          </div>
+
+          {/* Cursos Concluídos */}
+          <div className="card p-6 hover:shadow-large transition-all duration-300 animate-fade-in" style={{ animationDelay: '100ms' }}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Concluídos</p>
+                <p className="text-3xl font-bold text-green-600">{metrics.completed}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {metrics.total > 0 ? Math.round((metrics.completed / metrics.total) * 100) : 0}% do total
+                </p>
+              </div>
+              <div className="p-3 bg-green-100 rounded-xl">
+                <CheckCircle2 className="text-green-600" size={32} />
+              </div>
+            </div>
+          </div>
+
+          {/* Cursos em Andamento */}
+          <div className="card p-6 hover:shadow-large transition-all duration-300 animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Em Andamento</p>
+                <p className="text-3xl font-bold text-blue-600">{metrics.inProgress}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {metrics.total > 0 ? Math.round((metrics.inProgress / metrics.total) * 100) : 0}% do total
+                </p>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-xl">
+                <TrendingUp className="text-blue-600" size={32} />
+              </div>
+            </div>
+          </div>
+
+          {/* Cursos Atrasados */}
+          <div className="card p-6 hover:shadow-large transition-all duration-300 animate-fade-in" style={{ animationDelay: '300ms' }}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Atrasados</p>
+                <p className="text-3xl font-bold text-red-600">{metrics.delayed}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Requer atenção urgente
+                </p>
+              </div>
+              <div className="p-3 bg-red-100 rounded-xl">
+                <AlertCircle className="text-red-600" size={32} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Métricas Adicionais */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Média de Conclusão */}
+          <div className="card p-6 animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Target size={24} className="text-purple-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Média de Conclusão</h3>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-600">Progresso Geral</span>
+                  <span className="font-bold text-gray-900">{metrics.averageCompletion}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 h-full transition-all duration-500 rounded-full"
+                    style={{ width: `${metrics.averageCompletion}%` }}
+                  ></div>
+                </div>
+              </div>
+              <div className="pt-3 border-t border-gray-200">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Não Iniciados</span>
+                  <span className="font-medium text-gray-700">{metrics.notStarted}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Carga Horária Total */}
+          <div className="card p-6 animate-fade-in" style={{ animationDelay: '500ms' }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Clock size={24} className="text-orange-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Carga Horária</h3>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <p className="text-3xl font-bold text-gray-900">{metrics.totalWorkload}h</p>
+                <p className="text-sm text-gray-600 mt-1">Total de todos os cursos</p>
+              </div>
+              <div className="pt-3 border-t border-gray-200">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Média por curso</span>
+                  <span className="font-medium text-gray-700">
+                    {metrics.total > 0 ? Math.round(metrics.totalWorkload / metrics.total) : 0}h
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Distribuição por Tipo */}
+          <div className="card p-6 animate-fade-in" style={{ animationDelay: '600ms' }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-indigo-100 rounded-lg">
+                <BarChart3 size={24} className="text-indigo-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900">Por Tipo de Treinamento</h3>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(metrics.byType)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5)
+                .map(([type, count], index) => (
+                  <div key={type} className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">{type}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-24 bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-indigo-600 h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${(count / metrics.total) * 100}%`,
+                            transitionDelay: `${700 + index * 50}ms`
+                          }}
+                        ></div>
+                      </div>
+                      <span className="font-medium text-gray-900 w-6 text-right">{count}</span>
+                    </div>
+                  </div>
+                ))}
+              {Object.keys(metrics.byType).length === 0 && (
+                <p className="text-sm text-gray-500 text-center py-2">Nenhum curso cadastrado</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Filtros */}

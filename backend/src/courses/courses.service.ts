@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Course } from './entities/course.entity';
 import { ChecklistItem } from './entities/checklist-item.entity';
+import { User } from '../users/entities/user.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CourseFiltersDto } from './dto/course-filters.dto';
@@ -14,6 +15,8 @@ export class CoursesService {
     private readonly courseRepository: Repository<Course>,
     @InjectRepository(ChecklistItem)
     private readonly checklistRepository: Repository<ChecklistItem>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(createCourseDto: CreateCourseDto): Promise<Course> {
@@ -26,7 +29,21 @@ export class CoursesService {
       completion: 0,
     });
 
+    // Atribuir responsável
+    if (createCourseDto.responsibleId) {
+      course.responsible = { id: createCourseDto.responsibleId } as any;
+    }
+
     const savedCourse = await this.courseRepository.save(course);
+
+    // Atribuir usuários ao curso
+    if (createCourseDto.assignedUserIds && createCourseDto.assignedUserIds.length > 0) {
+      const users = await this.userRepository.findBy({
+        id: In(createCourseDto.assignedUserIds),
+      });
+      savedCourse.assignedUsers = users;
+      await this.courseRepository.save(savedCourse);
+    }
 
     // Cria checklist inicial para determinar o andamento
     const checklistItems = [
@@ -45,11 +62,18 @@ export class CoursesService {
   async findAll(filters: CourseFiltersDto) {
     const {
       search,
+      userId,
       page = 1,
       limit = 10,
     } = filters;
 
     const queryBuilder = this.courseRepository.createQueryBuilder('course');
+
+    // Carrega relações
+    queryBuilder
+      .leftJoinAndSelect('course.checklist', 'checklist')
+      .leftJoinAndSelect('course.responsible', 'responsible')
+      .leftJoinAndSelect('course.assignedUsers', 'assignedUsers');
 
     if (search) {
       queryBuilder.where(
@@ -58,9 +82,13 @@ export class CoursesService {
       );
     }
 
+    // Filtrar por usuário atribuído
+    if (userId) {
+      queryBuilder.andWhere('assignedUsers.id = :userId', { userId });
+    }
+
     const skip = (page - 1) * limit;
     queryBuilder
-      .leftJoinAndSelect('course.checklist', 'checklist')
       .skip(skip)
       .take(limit)
       .orderBy('course.createdAt', 'DESC');
@@ -92,7 +120,7 @@ export class CoursesService {
   async findOne(id: string): Promise<Course> {
     const course = await this.courseRepository.findOne({
       where: { id },
-      relations: ['checklist'],
+      relations: ['checklist', 'responsible', 'assignedUsers'],
     });
 
     if (!course) {
@@ -128,6 +156,27 @@ export class CoursesService {
     }
     if (updateCourseDto.expirationDate !== undefined) {
       course.expirationDate = new Date(updateCourseDto.expirationDate);
+    }
+
+    // Atualizar responsável
+    if (updateCourseDto.responsibleId !== undefined) {
+      if (updateCourseDto.responsibleId) {
+        course.responsible = { id: updateCourseDto.responsibleId } as any;
+      } else {
+        course.responsible = null as any;
+      }
+    }
+
+    // Atualizar usuários atribuídos
+    if (updateCourseDto.assignedUserIds !== undefined) {
+      if (updateCourseDto.assignedUserIds.length > 0) {
+        const users = await this.userRepository.findBy({
+          id: In(updateCourseDto.assignedUserIds),
+        });
+        course.assignedUsers = users;
+      } else {
+        course.assignedUsers = [];
+      }
     }
 
     const updatedCourse = await this.courseRepository.save(course);

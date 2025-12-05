@@ -1,9 +1,6 @@
 import { apiClient } from './api';
 import { LoginRequest, LoginResponse } from '../types/api';
 
-// Flag para usar mock ou API real
-const USE_MOCK = import.meta.env.VITE_USE_MOCK_AUTH === 'true';
-
 /**
  * Serviço de autenticação
  * Gerencia todas as operações relacionadas à autenticação de usuários
@@ -13,67 +10,14 @@ class AuthService {
   private readonly USER_KEY = 'user';
 
   /**
-   * Simula uma chamada ao backend (MOCK)
-   * Remove esta função quando o backend estiver pronto
-   */
-  private async loginMock(email: string, password: string): Promise<LoginResponse> {
-    // Simula delay de rede
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Validação básica
-    if (!email || !password) {
-      throw new Error('Email e senha são obrigatórios');
-    }
-
-    // Simula erro de credenciais inválidas
-    if (password.length < 3) {
-      throw new Error('Credenciais inválidas');
-    }
-
-    // Gera um token JWT mockado
-    const mockToken = `mock.jwt.token.${Date.now()}`;
-
-    // Determina o role baseado no email (apenas para fins de demonstração)
-    let role: 'admin' | 'instructor' | 'student' = 'student';
-    if (email.includes('admin')) {
-      role = 'admin';
-    } else if (email.includes('instructor') || email.includes('produtor')) {
-      role = 'instructor';
-    }
-
-    // Cria resposta mockada no formato esperado
-    const mockResponse: LoginResponse = {
-      token: mockToken,
-      user: {
-        id: Math.random().toString(36).substr(2, 9),
-        name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        email: email,
-        role: role,
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(email.split('@')[0])}&background=random`,
-      }
-    };
-
-    return mockResponse;
-  }
-
-  /**
    * Realiza login do usuário
    * @param email - Email do usuário
    * @param password - Senha do usuário
    * @returns Resposta da API com token e dados do usuário
    */
   async login(email: string, password: string): Promise<LoginResponse> {
-    let response: LoginResponse;
-
-    if (USE_MOCK) {
-      // Usa versão mockada
-      console.log('🔧 Usando autenticação MOCKADA');
-      response = await this.loginMock(email, password);
-    } else {
-      // Usa API real
-      const payload: LoginRequest = { email, password };
-      response = await apiClient.post<LoginResponse>('/auth/login', payload);
-    }
+    const payload: LoginRequest = { email, password };
+    const response = await apiClient.post<LoginResponse>('/auth/login', payload);
 
     // Armazena o token e dados do usuário
     this.setToken(response.token);

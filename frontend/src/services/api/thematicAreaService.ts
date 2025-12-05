@@ -1,49 +1,25 @@
 import { apiClient } from '../api';
 import { ThematicArea } from '../../types';
-
-export interface ThematicAreaFilters {
-  search?: string;
-  coordinatorId?: string;
-  isActive?: boolean;
-}
-
-export interface CreateThematicAreaDto {
-  name: string;
-  description?: string;
-  coordinatorId?: string;
-  isActive?: boolean;
-}
-
-export interface UpdateThematicAreaDto extends Partial<CreateThematicAreaDto> {}
+import { PaginatedResponse, SingleResponse } from '../../types/api';
 
 export const thematicAreaService = {
-  getAll: async (filters?: ThematicAreaFilters) => {
-    const params = new URLSearchParams();
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          params.append(key, String(value));
-        }
-      });
-    }
-    const queryString = params.toString();
-    const endpoint = queryString ? `/thematic-areas?${queryString}` : '/thematic-areas';
-    return apiClient.get<{ data: ThematicArea[] }>(endpoint);
+  getAll: async (): Promise<PaginatedResponse<ThematicArea>> => {
+    return apiClient.get<PaginatedResponse<ThematicArea>>('/thematic-areas');
   },
 
-  getById: async (id: string) => {
-    return apiClient.get<ThematicArea>(`/thematic-areas/${id}`);
+  getById: async (id: string): Promise<SingleResponse<ThematicArea>> => {
+    return apiClient.get<SingleResponse<ThematicArea>>(`/thematic-areas/${id}`);
   },
 
-  create: async (data: CreateThematicAreaDto) => {
-    return apiClient.post<ThematicArea>('/thematic-areas', data);
+  create: async (thematicArea: Partial<ThematicArea>): Promise<SingleResponse<ThematicArea>> => {
+    return apiClient.post<SingleResponse<ThematicArea>>('/thematic-areas', thematicArea);
   },
 
-  update: async (id: string, data: UpdateThematicAreaDto) => {
-    return apiClient.put<ThematicArea>(`/thematic-areas/${id}`, data);
+  update: async (id: string, thematicArea: Partial<ThematicArea>): Promise<SingleResponse<ThematicArea>> => {
+    return apiClient.put<SingleResponse<ThematicArea>>(`/thematic-areas/${id}`, thematicArea);
   },
 
-  delete: async (id: string) => {
-    return apiClient.delete(`/thematic-areas/${id}`);
+  delete: async (id: string): Promise<void> => {
+    return apiClient.delete<void>(`/thematic-areas/${id}`);
   },
 };

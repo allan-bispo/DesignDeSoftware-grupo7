@@ -4,11 +4,16 @@ import {
   Column,
   CreateDateColumn,
   OneToMany,
+  ManyToOne,
+  ManyToMany,
+  JoinColumn,
+  JoinTable,
 } from 'typeorm';
 import { ChecklistItem } from './checklist-item.entity';
 import { ActionHistory } from './action-history.entity';
 import { Comment } from './comment.entity';
 import { UsefulLink } from './useful-link.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity({ name: 'courses' })
 export class Course {
@@ -53,6 +58,20 @@ export class Course {
     cascade: true,
   })
   usefulLinks: UsefulLink[];
+
+  // Responsável pelo curso
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'responsible_id' })
+  responsible: User;
+
+  // Usuários atribuídos ao curso (estudantes, tutores, etc.)
+  @ManyToMany(() => User)
+  @JoinTable({
+    name: 'course_assigned_users',
+    joinColumn: { name: 'course_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+  })
+  assignedUsers: User[];
 
   @CreateDateColumn()
   createdAt: Date;

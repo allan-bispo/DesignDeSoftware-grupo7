@@ -19,6 +19,10 @@ export class MicrocourseFiltersDto {
   learningTrailId?: string;
 
   @IsOptional()
+  @IsString()
+  userId?: string;
+
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)

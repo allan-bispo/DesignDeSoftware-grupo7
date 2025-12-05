@@ -4,6 +4,8 @@ import {
   IsDateString,
   IsNumber,
   Min,
+  IsUUID,
+  IsArray,
 } from 'class-validator';
 
 export class UpdateCourseDto {
@@ -27,4 +29,13 @@ export class UpdateCourseDto {
   @IsDateString()
   @IsOptional()
   expirationDate?: string;
+
+  @IsUUID()
+  @IsOptional()
+  responsibleId?: string;
+
+  @IsArray()
+  @IsUUID('4', { each: true })
+  @IsOptional()
+  assignedUserIds?: string[];
 }

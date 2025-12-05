@@ -6,6 +6,10 @@ export class CourseFiltersDto {
   @IsOptional()
   search?: string;
 
+  @IsString()
+  @IsOptional()
+  userId?: string;
+
   @Type(() => Number)
   @IsNumber()
   @Min(1)

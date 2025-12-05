@@ -104,6 +104,15 @@ export class Microcourse {
   @JoinColumn({ name: 'coordinator_id' })
   coordinator: User;
 
+  // Usuários atribuídos ao microcurso (estudantes, tutores, etc.)
+  @ManyToMany(() => User)
+  @JoinTable({
+    name: 'microcourse_assigned_users',
+    joinColumn: { name: 'microcourse_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+  })
+  assignedUsers: User[];
+
   // Fluxo de validação
   @OneToMany(() => ValidationWorkflow, (workflow) => workflow.microcourse)
   validationWorkflows: ValidationWorkflow[];

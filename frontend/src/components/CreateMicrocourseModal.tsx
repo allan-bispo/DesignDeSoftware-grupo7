@@ -1,12 +1,15 @@
-import { useState } from 'react';
-import { X, GraduationCap } from 'lucide-react';
-import { PedagogicalApproach, PedagogicalApproachLabels } from '../types';
+import { useState, useEffect } from 'react';
+import { X, GraduationCap, Users } from 'lucide-react';
+import { PedagogicalApproach, PedagogicalApproachLabels, Microcourse } from '../types';
+import { User } from '../types/user';
 import { microcourseService } from '../services/api/microcourseService';
+import { userService } from '../services/api/userService';
 
 interface CreateMicrocourseModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  microcourse?: Microcourse | null; // Para edição
 }
 
 interface FormData {
@@ -34,7 +37,10 @@ export default function CreateMicrocourseModal({
   isOpen,
   onClose,
   onSuccess,
+  microcourse,
 }: CreateMicrocourseModalProps) {
+  const isEditing = !!microcourse;
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     description: '',
@@ -54,6 +60,53 @@ export default function CreateMicrocourseModal({
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState<User[]>([]);
+  const [assignedUserIds, setAssignedUserIds] = useState<string[]>([]);
+
+  // Carregar lista de usuários
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const response = await userService.getAllUsers();
+        setAvailableUsers(response.data || []);
+      } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+      }
+    };
+
+    if (isOpen) {
+      loadUsers();
+    }
+  }, [isOpen]);
+
+  // Preencher formulário quando estiver editando
+  useEffect(() => {
+    if (isOpen && microcourse) {
+      setFormData({
+        name: microcourse.name || '',
+        description: microcourse.description || '',
+        syllabus: microcourse.syllabus || '',
+        expectedCompetencies: microcourse.expectedCompetencies || '',
+        graduateProfile: microcourse.graduateProfile || '',
+        bibliography: microcourse.bibliography || '',
+        workload: microcourse.workload?.toString() || '',
+        pedagogicalApproach: microcourse.pedagogicalApproach || PedagogicalApproach.SELF_INSTRUCTIONAL,
+        programContent: microcourse.programContent || '',
+        evaluationMethods: microcourse.evaluationMethods || '',
+        teachingStrategies: microcourse.teachingStrategies || '',
+        learningTrailId: microcourse.learningTrail?.id || '',
+        thematicAreaId: microcourse.thematicArea?.id || '',
+        coordinatorId: microcourse.coordinator?.id || '',
+      });
+
+      // Carregar usuários atribuídos
+      if (microcourse.assignedUsers) {
+        setAssignedUserIds(microcourse.assignedUsers.map((u: User) => u.id));
+      }
+    } else {
+      setAssignedUserIds([]);
+    }
+  }, [isOpen, microcourse]);
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
@@ -128,15 +181,23 @@ export default function CreateMicrocourseModal({
       if (formData.coordinatorId.trim()) {
         payload.coordinatorId = formData.coordinatorId.trim();
       }
+      if (assignedUserIds.length > 0) {
+        payload.assignedUserIds = assignedUserIds;
+      }
 
-      await microcourseService.create(payload);
+      if (isEditing && microcourse) {
+        await microcourseService.update(microcourse.id, payload);
+      } else {
+        await microcourseService.create(payload);
+      }
+
       handleClose();
       if (onSuccess) {
         onSuccess();
       }
     } catch (error) {
-      console.error('Erro ao criar microcurso:', error);
-      setErrors({ submit: 'Erro ao criar microcurso. Tente novamente.' });
+      console.error(`Erro ao ${isEditing ? 'atualizar' : 'criar'} microcurso:`, error);
+      setErrors({ submit: `Erro ao ${isEditing ? 'atualizar' : 'criar'} microcurso. Tente novamente.` });
     } finally {
       setIsLoading(false);
     }
@@ -160,7 +221,16 @@ export default function CreateMicrocourseModal({
       coordinatorId: '',
     });
     setErrors({});
+    setAssignedUserIds([]);
     onClose();
+  };
+
+  const toggleUserAssignment = (userId: string) => {
+    setAssignedUserIds(prev =>
+      prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
   };
 
   if (!isOpen) return null;
@@ -174,7 +244,9 @@ export default function CreateMicrocourseModal({
             <div className="p-2 bg-primary-100 rounded-lg">
               <GraduationCap className="text-primary-600" size={24} />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Criar Novo Microcurso</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {isEditing ? 'Editar Microcurso' : 'Criar Novo Microcurso'}
+            </h2>
           </div>
           <button
             onClick={handleClose}
@@ -424,6 +496,49 @@ export default function CreateMicrocourseModal({
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Atribuição de Usuários */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2 flex items-center gap-2">
+                <Users size={20} />
+                Atribuir Usuários ao Microcurso
+              </h3>
+              <p className="text-sm text-gray-600">
+                Selecione os usuários (estudantes, tutores) que terão acesso a este microcurso
+              </p>
+
+              <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 space-y-2">
+                {availableUsers.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    Nenhum usuário disponível
+                  </p>
+                ) : (
+                  availableUsers.map((user) => (
+                    <label
+                      key={user.id}
+                      className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={assignedUserIds.includes(user.id)}
+                        onChange={() => toggleUserAssignment(user.id)}
+                        className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                        <p className="text-xs text-gray-500">{user.email} • {user.role}</p>
+                      </div>
+                    </label>
+                  ))
+                )}
+              </div>
+
+              {assignedUserIds.length > 0 && (
+                <p className="text-sm text-primary-600 font-medium">
+                  {assignedUserIds.length} usuário(s) selecionado(s)
+                </p>
+              )}
             </div>
 
             {/* Erro de submissão */}

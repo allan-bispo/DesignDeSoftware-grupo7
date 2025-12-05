@@ -1,39 +1,26 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
 import { useUserStore } from '../store/useUserStore';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { login, isLoading } = useUserStore();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setError(null);
 
-    // Simula loading
-    setIsLoading(true);
-
-    // Timeout de 1.5 segundos e redireciona para o dashboard
-    setTimeout(() => {
-      // Define usuário mockado como autenticado
-      useUserStore.setState({
-        user: {
-          id: '1',
-          name: 'Usuário Demo',
-          email: email || 'demo@akcit.com',
-          role: 'admin',
-          avatar: undefined,
-          createdAt: new Date(),
-        },
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-      });
-
+    try {
+      await login(email, password);
       navigate('/dashboard');
-    }, 1500);
+    } catch (err) {
+      // Erro já é tratado no store, mas podemos exibir aqui também
+      setError(err instanceof Error ? err.message : 'Erro ao fazer login');
+    }
   };
 
   return (
@@ -59,6 +46,12 @@ export default function Login() {
 
         {/* Formulário */}
         <div className="card p-8 animate-slide-up">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">{error}</span>
+            </div>
+          )}
           <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Campo Email */}
             <div>

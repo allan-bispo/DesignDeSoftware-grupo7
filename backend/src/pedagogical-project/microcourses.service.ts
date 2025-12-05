@@ -1,16 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Microcourse, MicrocourseStatus } from './entities/microcourse.entity';
 import { CreateMicrocourseDto } from './dto/create-microcourse.dto';
 import { UpdateMicrocourseDto } from './dto/update-microcourse.dto';
 import { MicrocourseFiltersDto } from './dto/microcourse-filters.dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class MicrocoursesService {
   constructor(
     @InjectRepository(Microcourse)
     private readonly microcourseRepository: Repository<Microcourse>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(createMicrocourseDto: CreateMicrocourseDto): Promise<Microcourse> {
@@ -42,6 +45,15 @@ export class MicrocoursesService {
     }
 
     const microcourse = this.microcourseRepository.create(microcourseData);
+
+    // Atribuir usuários ao microcurso
+    if (createMicrocourseDto.assignedUserIds && createMicrocourseDto.assignedUserIds.length > 0) {
+      const users = await this.userRepository.findBy({
+        id: In(createMicrocourseDto.assignedUserIds),
+      });
+      microcourse.assignedUsers = users;
+    }
+
     return await this.microcourseRepository.save(microcourse);
   }
 
@@ -51,6 +63,7 @@ export class MicrocoursesService {
       status,
       thematicAreaId,
       learningTrailId,
+      userId,
       page = 1,
       limit = 100,
     } = filters;
@@ -61,7 +74,8 @@ export class MicrocoursesService {
     queryBuilder
       .leftJoinAndSelect('microcourse.thematicArea', 'thematicArea')
       .leftJoinAndSelect('microcourse.learningTrail', 'learningTrail')
-      .leftJoinAndSelect('microcourse.coordinator', 'coordinator');
+      .leftJoinAndSelect('microcourse.coordinator', 'coordinator')
+      .leftJoinAndSelect('microcourse.assignedUsers', 'assignedUsers');
 
     // Filtros
     if (search) {
@@ -85,6 +99,11 @@ export class MicrocoursesService {
       queryBuilder.andWhere('microcourse.learningTrail.id = :learningTrailId', {
         learningTrailId,
       });
+    }
+
+    // Filtrar por usuário atribuído
+    if (userId) {
+      queryBuilder.andWhere('assignedUsers.id = :userId', { userId });
     }
 
     const skip = (page - 1) * limit;
@@ -115,6 +134,7 @@ export class MicrocoursesService {
         'coordinator',
         'prerequisites',
         'validationWorkflows',
+        'assignedUsers',
       ],
     });
 
@@ -131,7 +151,21 @@ export class MicrocoursesService {
   ): Promise<Microcourse> {
     const microcourse = await this.findOne(id);
 
-    Object.assign(microcourse, updateMicrocourseDto);
+    // Atualizar campos básicos
+    const { assignedUserIds, ...basicFields } = updateMicrocourseDto;
+    Object.assign(microcourse, basicFields);
+
+    // Atualizar usuários atribuídos, se fornecido
+    if (assignedUserIds !== undefined) {
+      if (assignedUserIds.length > 0) {
+        const users = await this.userRepository.findBy({
+          id: In(assignedUserIds),
+        });
+        microcourse.assignedUsers = users;
+      } else {
+        microcourse.assignedUsers = [];
+      }
+    }
 
     return await this.microcourseRepository.save(microcourse);
   }

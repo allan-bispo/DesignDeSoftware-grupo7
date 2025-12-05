@@ -9,6 +9,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -18,8 +19,12 @@ import {
   SingleResponse,
   PaginatedResponse,
 } from '../common/interfaces/response.interface';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { UserRole } from '../users/entities/user.entity';
 
 @Controller('courses')
+@UseGuards(JwtAuthGuard)
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
@@ -34,7 +39,18 @@ export class CoursesController {
   @Get()
   async findAll(
     @Query() filters: CourseFiltersDto,
+    @CurrentUser() user: any,
   ): Promise<PaginatedResponse<any>> {
+    // Se o usuário for estudante ou tutor, filtrar apenas seus cursos
+    const rolesWithRestrictedAccess = [
+      UserRole.STUDENT,
+      UserRole.TUTOR,
+    ];
+
+    if (user && rolesWithRestrictedAccess.includes(user.role)) {
+      filters.userId = user.sub; // JWT payload usa 'sub' para user ID
+    }
+
     return await this.coursesService.findAll(filters);
   }
 

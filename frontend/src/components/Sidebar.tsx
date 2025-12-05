@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, BookOpen, Users, BarChart3, Library, LogOut, Shield,
-  GraduationCap, Briefcase, FileText, School, UserCheck, Calendar, Award
+  GraduationCap, Briefcase, FileText, School, UserCheck, Calendar, Award, User, Mail, Inbox
 } from 'lucide-react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useUserStore } from '../store/useUserStore';
@@ -48,6 +48,20 @@ export default function Sidebar() {
       icon: Shield,
       path: '/user-management',
       allowedRoles: ['admin'] // Corrigido para minúsculo
+    },
+    {
+      id: 'email-settings',
+      label: 'Configurar Email',
+      icon: Mail,
+      path: '/email-settings',
+      allowedRoles: ['admin']
+    },
+    {
+      id: 'email-history',
+      label: 'Histórico de Emails',
+      icon: Inbox,
+      path: '/email-history',
+      allowedRoles: ['admin']
     },
   ];
 
@@ -111,8 +125,22 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      {/* Logout Button */}
-      <div className="p-4 border-t border-gray-200 flex-shrink-0 bg-gray-50">
+      {/* User Section */}
+      <div className="p-4 border-t border-gray-200 flex-shrink-0 bg-gray-50 space-y-2">
+        <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            `w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium group ${
+              isActive
+                ? 'bg-primary-600 text-white shadow-medium'
+                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+            }`
+          }
+        >
+          <User size={20} className="group-hover:scale-110 transition-transform" />
+          <span>Meu Perfil</span>
+        </NavLink>
+
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 transition-all duration-200 font-medium group"

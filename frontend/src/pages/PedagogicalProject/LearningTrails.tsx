@@ -1,52 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Users, BookOpen, TrendingUp, ArrowRight } from 'lucide-react';
 import { LearningTrail } from '../../types';
+import { learningTrailService } from '../../services/api/learningTrailService';
 
 export default function LearningTrails() {
-  // Dados mockados de trilhas de aprendizagem
-  const [trails] = useState<LearningTrail[]>([
-    {
-      id: '1',
-      name: 'Desenvolvimento Web Full Stack',
-      description: 'Trilha completa para se tornar um desenvolvedor Full Stack, desde fundamentos até tecnologias avançadas.',
-      objectives: 'Capacitar o aluno a desenvolver aplicações web completas, desde o frontend até o backend e deploy.',
-      order: 1,
-      isActive: true,
-      createdAt: '2025-01-05T10:00:00Z',
-      updatedAt: '2025-01-15T14:30:00Z',
-    },
-    {
-      id: '2',
-      name: 'Ciência de Dados e Machine Learning',
-      description: 'Aprenda análise de dados, visualização, estatística e machine learning com Python.',
-      objectives: 'Preparar profissionais para trabalhar com análise e ciência de dados utilizando ferramentas modernas.',
-      order: 2,
-      isActive: true,
-      createdAt: '2025-01-08T09:00:00Z',
-      updatedAt: '2025-01-18T11:00:00Z',
-    },
-    {
-      id: '3',
-      name: 'DevOps e Cloud Computing',
-      description: 'Domine práticas DevOps, containers, orquestração e serviços em nuvem.',
-      objectives: 'Capacitar profissionais em práticas DevOps modernas e uso de plataformas cloud.',
-      order: 3,
-      isActive: true,
-      createdAt: '2025-01-10T08:00:00Z',
-      updatedAt: '2025-01-20T16:00:00Z',
-    },
-    {
-      id: '4',
-      name: 'Desenvolvimento Mobile',
-      description: 'Crie aplicativos mobile para Android e iOS usando React Native e Flutter.',
-      objectives: 'Formar desenvolvedores capazes de criar apps mobile multiplataforma.',
-      order: 4,
-      isActive: true,
-      createdAt: '2025-01-12T10:30:00Z',
-      updatedAt: '2025-01-22T13:00:00Z',
-    },
-  ]);
+  const [trails, setTrails] = useState<LearningTrail[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadTrails();
+  }, []);
+
+  const loadTrails = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await learningTrailService.getAll();
+      setTrails(response.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao carregar trilhas de aprendizagem');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const stats = {
     totalTrails: trails.length,

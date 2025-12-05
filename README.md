@@ -408,6 +408,27 @@ npm run dev
 ```
 O frontend estará disponível em `http://localhost:5173`
 
+### 🔑 Credenciais de Acesso
+
+O sistema possui usuários pré-cadastrados para teste com diferentes níveis de acesso:
+
+#### Administrador (Acesso Total)
+- **Email:** `superadmin@akcit.com`
+- **Senha:** `Admin@123`
+- **Permissões:** Acesso total ao sistema, incluindo gestão de usuários
+
+#### Professor/Instrutor
+- **Email:** `professor@akcit.com`
+- **Senha:** `professor123`
+- **Permissões:** Gestão de cursos, biblioteca e projetos pedagógicos
+
+#### Aluno/Estudante
+- **Email:** `aluno@akcit.com`
+- **Senha:** `aluno123`
+- **Permissões:** Visualização de cursos e acesso limitado
+
+> **Nota de Segurança:** Estas são credenciais para ambiente de desenvolvimento. Em produção, sempre altere as senhas padrão e utilize senhas seguras.
+
 ### Build para Produção
 
 **Backend:**

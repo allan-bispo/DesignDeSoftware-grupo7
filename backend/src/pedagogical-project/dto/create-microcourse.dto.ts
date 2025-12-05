@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, IsEnum, IsUUID } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsEnum, IsUUID, IsArray } from 'class-validator';
 import { PedagogicalApproach, MicrocourseStatus } from '../entities/microcourse.entity';
 
 export class CreateMicrocourseDto {
@@ -56,5 +56,10 @@ export class CreateMicrocourseDto {
   @IsUUID()
   @IsOptional()
   coordinatorId?: string;
+
+  @IsArray()
+  @IsUUID('4', { each: true })
+  @IsOptional()
+  assignedUserIds?: string[];
 }
 

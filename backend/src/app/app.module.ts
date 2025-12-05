@@ -16,9 +16,13 @@ import { AvaManagementModule } from '../ava-management/ava-management.module';
 import { StudentInteractionModule } from '../student-interaction/student-interaction.module';
 import { EventsModule } from '../events/events.module';
 import { CertificatesModule } from '../certificates/certificates.module';
+import { EmailModule } from '../email/email.module';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Module({
   imports: [
@@ -51,8 +55,19 @@ import { AppService } from './app.service';
     StudentInteractionModule,
     EventsModule,
     CertificatesModule,
+    EmailModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

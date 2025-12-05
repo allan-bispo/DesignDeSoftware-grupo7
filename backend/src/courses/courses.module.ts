@@ -7,6 +7,7 @@ import { ChecklistItem } from './entities/checklist-item.entity';
 import { UsefulLink } from './entities/useful-link.entity';
 import { Comment } from './entities/comment.entity';
 import { ActionHistory } from './entities/action-history.entity';
+import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ActionHistory } from './entities/action-history.entity';
       UsefulLink,
       Comment,
       ActionHistory,
+      User,
     ]),
   ],
   controllers: [CoursesController],

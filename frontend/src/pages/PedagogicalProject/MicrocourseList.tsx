@@ -1,12 +1,22 @@
-import { useState } from 'react';
-import { Plus, Search, GraduationCap, X, Clock, BookOpen, Target, Award, Lightbulb, CheckCircle2, Link2, History, ListTodo, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Search, GraduationCap, X, Clock, BookOpen, Target, Award, Lightbulb, CheckCircle2, Link2, History, ListTodo, ExternalLink, Loader2, Trash2, Edit } from 'lucide-react';
 import { Microcourse, MicrocourseStatus, PedagogicalApproach } from '../../types';
 import CreateMicrocourseModal from '../../components/CreateMicrocourseModal';
 import { mockLibraryItems } from '../../data/mockData';
+import { microcourseService } from '../../services/api/microcourseService';
+import { useUserStore } from '../../store/useUserStore';
 
 type ModalTab = 'info' | 'library' | 'recent' | 'general';
 
 export default function MicrocourseList() {
+  const user = useUserStore((state) => state.user);
+  const userRole = user?.role || 'student';
+
+  // Verificar permissões
+  const canCreate = userRole === 'admin' || userRole === 'instructor';
+  const canEdit = userRole === 'admin' || userRole === 'instructor';
+  const canDelete = userRole === 'admin';
+
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedMicrocourse, setSelectedMicrocourse] = useState<Microcourse | null>(null);
@@ -21,61 +31,41 @@ export default function MicrocourseList() {
     'Fórum de discussão': false,
     'Questionário de autoavaliação': false,
   });
+  const [microcourses, setMicrocourses] = useState<Microcourse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [microcourseToEdit, setMicrocourseToEdit] = useState<Microcourse | null>(null);
 
-  // Dados mockados de microcursos
-  const [microcourses, setMicrocourses] = useState<Microcourse[]>([
-    {
-      id: '1',
-      name: 'Introdução à Programação em Python',
-      description: 'Aprenda os fundamentos da programação utilizando Python, uma das linguagens mais versáteis e populares.',
-      syllabus: 'Conceitos básicos de programação, sintaxe Python, estruturas de dados, funções e módulos.',
-      workload: 40,
-      pedagogicalApproach: PedagogicalApproach.SELF_INSTRUCTIONAL,
-      status: MicrocourseStatus.PUBLISHED,
-      createdAt: '2025-01-10T10:00:00Z',
-      updatedAt: '2025-01-15T14:30:00Z',
-    },
-    {
-      id: '2',
-      name: 'Desenvolvimento Web com React',
-      description: 'Construa aplicações web modernas e responsivas utilizando React e suas melhores práticas.',
-      syllabus: 'Componentes React, hooks, gerenciamento de estado, roteamento e integração com APIs.',
-      workload: 60,
-      pedagogicalApproach: PedagogicalApproach.TUTOR_SUPPORTED,
-      status: MicrocourseStatus.IN_INTERNAL_VALIDATION,
-      createdAt: '2025-01-12T09:00:00Z',
-      updatedAt: '2025-01-20T16:00:00Z',
-    },
-    {
-      id: '3',
-      name: 'Banco de Dados Relacionais',
-      description: 'Domine conceitos de modelagem, normalização e consultas SQL em bancos de dados relacionais.',
-      syllabus: 'Modelagem ER, normalização, SQL básico e avançado, transações e otimização.',
-      workload: 50,
-      pedagogicalApproach: PedagogicalApproach.ADVISOR_SUPPORTED,
-      status: MicrocourseStatus.APPROVED,
-      createdAt: '2025-01-08T11:00:00Z',
-      updatedAt: '2025-01-18T13:00:00Z',
-    },
-    {
-      id: '4',
-      name: 'DevOps Essencial',
-      description: 'Aprenda práticas de DevOps, automação de infraestrutura e CI/CD para melhorar o ciclo de desenvolvimento.',
-      syllabus: 'Git, Docker, Kubernetes, pipelines CI/CD, monitoramento e observabilidade.',
-      workload: 45,
-      pedagogicalApproach: PedagogicalApproach.TUTOR_SUPPORTED,
-      status: MicrocourseStatus.DRAFT,
-      createdAt: '2025-01-20T08:00:00Z',
-      updatedAt: '2025-01-22T10:00:00Z',
-    },
-  ]);
+  // Carregar microcursos da API
+  const loadMicrocourses = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await microcourseService.getAll({ search: searchTerm });
+      setMicrocourses(response.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao carregar microcursos');
+      console.error('Erro ao carregar microcursos:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // Filtra microcursos por termo de busca
-  const filteredMicrocourses = microcourses.filter(
-    (mc) =>
-      mc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mc.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Carregar microcursos ao montar o componente
+  useEffect(() => {
+    loadMicrocourses();
+  }, []);
+
+  // Recarregar quando o termo de busca mudar (com debounce)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadMicrocourses();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Como a busca já é feita na API, não precisa filtrar localmente
+  const filteredMicrocourses = microcourses;
 
   const handleOpenDetails = (microcourse: Microcourse) => {
     setSelectedMicrocourse(microcourse);
@@ -87,6 +77,29 @@ export default function MicrocourseList() {
     setIsDetailsModalOpen(false);
     setSelectedMicrocourse(null);
     setActiveTab('info');
+  };
+
+  const handleDelete = async (microcourseId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este microcurso? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+
+    try {
+      await microcourseService.delete(microcourseId);
+      handleCloseDetails();
+      loadMicrocourses(); // Recarregar lista
+    } catch (err) {
+      alert('Erro ao excluir microcurso. Tente novamente.');
+      console.error('Erro ao excluir:', err);
+    }
+  };
+
+  const handleEdit = () => {
+    if (selectedMicrocourse) {
+      setMicrocourseToEdit(selectedMicrocourse);
+      setIsDetailsModalOpen(false); // Fechar modal de detalhes
+      setIsCreateModalOpen(true); // Abrir modal de edição
+    }
   };
 
   const toggleLibraryItem = (itemId: string) => {
@@ -111,17 +124,12 @@ export default function MicrocourseList() {
     { id: '3', action: 'Status alterado', user: 'Sistema', timestamp: new Date('2025-01-20T16:00:00'), details: 'Status alterado para: Em Validação Interna' },
   ];
 
-  // Calcula a porcentagem de conclusão baseada nos checkboxes
+  // Calcula a porcentagem de conclusão baseada apenas nas atividades gerais
   const calculateCompletionPercentage = () => {
     const totalGeneralActivities = Object.keys(generalActivities).length;
     const completedGeneralActivities = Object.values(generalActivities).filter(Boolean).length;
-    const totalLibraryItems = mockLibraryItems.length;
-    const linkedItems = linkedLibraryItems.length;
 
-    const totalTasks = totalGeneralActivities + totalLibraryItems;
-    const completedTasks = completedGeneralActivities + linkedItems;
-
-    return totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    return totalGeneralActivities > 0 ? Math.round((completedGeneralActivities / totalGeneralActivities) * 100) : 0;
   };
 
   const completionPercentage = calculateCompletionPercentage();
@@ -155,13 +163,15 @@ export default function MicrocourseList() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Microcursos</h1>
           <p className="text-gray-600">Gestão do Projeto Pedagógico</p>
         </div>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="btn-primary flex items-center gap-2 group"
-        >
-          <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-          <span>Novo Microcurso</span>
-        </button>
+        {canCreate && (
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="btn-primary flex items-center gap-2 group"
+          >
+            <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+            <span>Novo Microcurso</span>
+          </button>
+        )}
       </div>
 
       {/* Barra de Busca */}
@@ -180,9 +190,21 @@ export default function MicrocourseList() {
 
       {/* Lista de Microcursos */}
       <div className="card overflow-hidden">
-        <div className="divide-y divide-gray-200">
-          {filteredMicrocourses.length > 0 ? (
-            filteredMicrocourses.map((microcourse: Microcourse, index: number) => (
+        {error && (
+          <div className="p-6 bg-red-50 border-b border-red-200">
+            <p className="text-red-700 text-center">{error}</p>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="p-12 text-center">
+            <Loader2 className="w-12 h-12 text-primary-600 animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Carregando microcursos...</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-200">
+            {filteredMicrocourses.length > 0 ? (
+              filteredMicrocourses.map((microcourse: Microcourse, index: number) => (
                 <button
                   key={microcourse.id}
                   onClick={() => handleOpenDetails(microcourse)}
@@ -214,16 +236,23 @@ export default function MicrocourseList() {
                 <p className="text-gray-500 text-sm">Tente ajustar os termos de busca</p>
               </div>
             )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Modal de Criação */}
+      {/* Modal de Criação/Edição */}
       <CreateMicrocourseModal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setMicrocourseToEdit(null);
+        }}
         onSuccess={() => {
           setIsCreateModalOpen(false);
+          setMicrocourseToEdit(null);
+          loadMicrocourses(); // Recarregar lista após criar/editar
         }}
+        microcourse={microcourseToEdit}
       />
 
       {/* Modal de Detalhes do Microcurso */}
@@ -638,12 +667,32 @@ export default function MicrocourseList() {
 
             {/* Modal Footer */}
             <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-2xl">
-              <button
-                onClick={handleCloseDetails}
-                className="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-large transition-all duration-200 hover:scale-105"
-              >
-                Fechar
-              </button>
+              <div className="flex gap-3">
+                {canDelete && (
+                  <button
+                    onClick={() => selectedMicrocourse && handleDelete(selectedMicrocourse.id)}
+                    className="px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all duration-200 flex items-center gap-2 group"
+                  >
+                    <Trash2 size={18} className="group-hover:scale-110 transition-transform" />
+                    <span>Excluir</span>
+                  </button>
+                )}
+                {canEdit && (
+                  <button
+                    onClick={handleEdit}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all duration-200 flex items-center gap-2 group"
+                  >
+                    <Edit size={18} className="group-hover:scale-110 transition-transform" />
+                    <span>Editar</span>
+                  </button>
+                )}
+                <button
+                  onClick={handleCloseDetails}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-large transition-all duration-200 hover:scale-105"
+                >
+                  Fechar
+                </button>
+              </div>
             </div>
           </div>
         </div>

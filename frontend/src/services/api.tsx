@@ -57,6 +57,11 @@ class HttpClient {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user');
 
+          // Redireciona para login se não estiver na página de login
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
+
           throw new ApiError(
             response.status,
             response.statusText,

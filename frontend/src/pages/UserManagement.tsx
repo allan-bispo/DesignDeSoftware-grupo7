@@ -1,53 +1,39 @@
-import { Users, UserPlus, Search, Edit, Trash2, Shield } from 'lucide-react';
-import { useState } from 'react';
+import { Users, UserPlus, Search, Edit, Trash2, Shield, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { usePermissions } from '../hooks/usePermissions';
 import Avatar from '../components/Avatar';
 import Tag from '../components/Tag';
-
-interface MockUser {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'instructor' | 'student';
-  createdAt: string;
-}
+import CreateUserModal from '../components/CreateUserModal';
+import { userService } from '../services/api/userService';
+import { User } from '../types/user';
 
 export default function UserManagement() {
   const { user: currentUser } = usePermissions();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Dados mockados de usuários
-  const [users] = useState<MockUser[]>([
-    {
-      id: '1',
-      name: 'João Admin',
-      email: 'admin@courseflow.com',
-      role: 'admin',
-      createdAt: '2024-01-15',
-    },
-    {
-      id: '2',
-      name: 'Maria Silva',
-      email: 'maria.silva@courseflow.com',
-      role: 'instructor',
-      createdAt: '2024-02-20',
-    },
-    {
-      id: '3',
-      name: 'Carlos Santos',
-      email: 'carlos.santos@courseflow.com',
-      role: 'instructor',
-      createdAt: '2024-03-10',
-    },
-    {
-      id: '4',
-      name: 'Ana Costa',
-      email: 'ana.costa@courseflow.com',
-      role: 'student',
-      createdAt: '2024-03-15',
-    },
-  ]);
+  // Carregar usuários
+  const loadUsers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await userService.getAllUsers();
+      setUsers(response.data || []);
+    } catch (err) {
+      setError('Erro ao carregar usuários');
+      console.error('Erro ao carregar usuários:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -55,7 +41,7 @@ export default function UserManagement() {
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getRoleBadge = (role: 'admin' | 'instructor' | 'student') => {
+  const getRoleBadge = (role: string) => {
     if (role === 'admin') {
       return (
         <Tag variant="purple" size="sm" icon={<Shield size={12} />}>
@@ -85,9 +71,9 @@ export default function UserManagement() {
     });
   };
 
-  const adminCount = users.filter((u) => u.role === 'admin').length;
-  const instructorCount = users.filter((u) => u.role === 'instructor').length;
-  const studentCount = users.filter((u) => u.role === 'student').length;
+  const adminCount = users.filter((u) => u.role.includes('admin') || u.role.includes('coordenador')).length;
+  const instructorCount = users.filter((u) => u.role.includes('professor') || u.role.includes('tutor')).length;
+  const studentCount = users.filter((u) => u.role === 'estudante').length;
 
   return (
     <div className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-50 min-h-screen">
@@ -134,7 +120,10 @@ export default function UserManagement() {
                 className="input-field pl-11"
               />
             </div>
-            <button className="btn-primary flex items-center gap-2 group">
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="btn-primary flex items-center gap-2 group"
+            >
               <UserPlus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
               <span>Adicionar Usuário</span>
             </button>
@@ -180,7 +169,18 @@ export default function UserManagement() {
 
         {/* Users Table */}
         <div className="card overflow-hidden">
-          {filteredUsers.length === 0 ? (
+          {error && (
+            <div className="p-6 bg-red-50 border-b border-red-200">
+              <p className="text-red-700 text-center">{error}</p>
+            </div>
+          )}
+
+          {isLoading ? (
+            <div className="p-12 text-center">
+              <Loader2 className="w-12 h-12 text-primary-600 animate-spin mx-auto mb-4" />
+              <p className="text-gray-600">Carregando usuários...</p>
+            </div>
+          ) : filteredUsers.length === 0 ? (
             <div className="p-12 text-center">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
                 <Users className="text-gray-400" size={40} />
@@ -259,6 +259,16 @@ export default function UserManagement() {
             </div>
           )}
         </div>
+
+        {/* Modal de Criação */}
+        <CreateUserModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={() => {
+            setIsCreateModalOpen(false);
+            loadUsers();
+          }}
+        />
 
         {/* Resumo */}
         {filteredUsers.length > 0 && (

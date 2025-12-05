@@ -10,6 +10,9 @@ import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
 import Library from './pages/Library';
 import UserManagement from './pages/UserManagement';
+import Profile from './pages/Profile';
+import EmailSettings from './pages/EmailSettings';
+import EmailHistory from './pages/EmailHistory';
 import { initializeUserStore } from './store/useUserStore';
 
 // Páginas AKCIT - Nova Arquitetura
@@ -75,9 +78,14 @@ function App() {
 
             <Route path="/analytics" element={<div className="p-8"><h1 className="text-2xl font-bold">Analytics</h1></div>} />
 
+            {/* Perfil do Usuário */}
+            <Route path="/profile" element={<Profile />} />
+
             {/* Rotas protegidas por role - Apenas Admin */}
             <Route element={<RoleGuard allowedRoles={['admin']} />}>
               <Route path="/user-management" element={<UserManagement />} />
+              <Route path="/email-settings" element={<EmailSettings />} />
+              <Route path="/email-history" element={<EmailHistory />} />
             </Route>
           </Route>
         </Route>

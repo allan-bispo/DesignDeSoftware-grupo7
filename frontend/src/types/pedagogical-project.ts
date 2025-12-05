@@ -83,6 +83,7 @@ export interface Microcourse {
   thematicArea?: ThematicArea;
   prerequisites?: Microcourse[];
   coordinator?: User;
+  assignedUsers?: User[];
   validationWorkflows?: ValidationWorkflow[];
   externalValidationData?: string;
   createdAt: string;
